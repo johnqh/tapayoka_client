@@ -1,4 +1,4 @@
-import type { NetworkClient } from '@sudobility/types';
+import type { NetworkClient, BaseResponse } from '@sudobility/types';
 import type {
   Device,
   Service,
@@ -19,192 +19,314 @@ import type {
   TelemetryEventRequest,
   DeviceServiceAssignRequest,
 } from '@sudobility/tapayoka_types';
-
-function authHeaders(token: string | null) {
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+import type { FirebaseIdToken } from '../types';
+import { buildUrl, createAuthHeaders, handleApiError } from '../utils/index';
 
 export class TapayokaClient {
-  constructor(
-    private networkClient: NetworkClient,
-    private baseUrl: string
-  ) {}
+  private readonly baseUrl: string;
+  private readonly networkClient: NetworkClient;
 
-  private url(path: string, entitySlug?: string | null): string {
-    const prefix = entitySlug ? `${this.baseUrl}/${entitySlug}` : this.baseUrl;
-    return `${prefix}${path}`;
+  constructor(config: { networkClient: NetworkClient; baseUrl: string }) {
+    this.baseUrl = config.baseUrl;
+    this.networkClient = config.networkClient;
   }
 
   // =========================================================================
   // Vendor: Devices
   // =========================================================================
 
-  async getDevices(token: string | null): Promise<Device[]> {
-    const res = await this.networkClient.get(this.url('/vendor/devices'), {
-      headers: authHeaders(token),
-    });
-    return res.data;
-  }
-
-  async getDevice(walletAddress: string, token: string | null): Promise<Device> {
-    const res = await this.networkClient.get(
-      this.url(`/vendor/devices/${walletAddress}`),
-      { headers: authHeaders(token) }
+  async getDevices(token: FirebaseIdToken): Promise<BaseResponse<Device[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Device[]>>(
+      buildUrl(this.baseUrl, 'vendor/devices'),
+      { headers }
     );
-    return res.data;
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get devices');
+    }
+    return response.data;
   }
 
-  async createDevice(data: DeviceCreateRequest, token: string | null): Promise<Device> {
-    const res = await this.networkClient.post(this.url('/vendor/devices'), data, {
-      headers: authHeaders(token),
-    });
-    return res.data;
+  async getDevice(
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Device>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Device>>(
+      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get device');
+    }
+    return response.data;
+  }
+
+  async createDevice(
+    data: DeviceCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Device>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<Device>>(
+      buildUrl(this.baseUrl, 'vendor/devices'),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create device');
+    }
+    return response.data;
   }
 
   async updateDevice(
     walletAddress: string,
     data: DeviceUpdateRequest,
-    token: string | null
-  ): Promise<Device> {
-    const res = await this.networkClient.put(
-      this.url(`/vendor/devices/${walletAddress}`),
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Device>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<BaseResponse<Device>>(
+      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}`),
       data,
-      { headers: authHeaders(token) }
+      { headers }
     );
-    return res.data;
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update device');
+    }
+    return response.data;
   }
 
-  async deleteDevice(walletAddress: string, token: string | null): Promise<void> {
-    await this.networkClient.delete(this.url(`/vendor/devices/${walletAddress}`), {
-      headers: authHeaders(token),
-    });
+  async deleteDevice(
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete device');
+    }
   }
 
-  async getDeviceServices(walletAddress: string, token: string | null): Promise<Service[]> {
-    const res = await this.networkClient.get(
-      this.url(`/vendor/devices/${walletAddress}/services`),
-      { headers: authHeaders(token) }
+  async getDeviceServices(
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Service[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Service[]>>(
+      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}/services`),
+      { headers }
     );
-    return res.data;
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get device services');
+    }
+    return response.data;
   }
 
   async assignDeviceServices(
     walletAddress: string,
     data: DeviceServiceAssignRequest,
-    token: string | null
+    token: FirebaseIdToken
   ): Promise<void> {
-    await this.networkClient.put(
-      this.url(`/vendor/devices/${walletAddress}/services`),
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put(
+      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}/services`),
       data,
-      { headers: authHeaders(token) }
+      { headers }
     );
+    if (!response.ok) {
+      throw handleApiError(response, 'assign device services');
+    }
   }
 
   // =========================================================================
   // Vendor: Services
   // =========================================================================
 
-  async getServices(token: string | null): Promise<Service[]> {
-    const res = await this.networkClient.get(this.url('/vendor/services'), {
-      headers: authHeaders(token),
-    });
-    return res.data;
+  async getServices(token: FirebaseIdToken): Promise<BaseResponse<Service[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Service[]>>(
+      buildUrl(this.baseUrl, 'vendor/services'),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get services');
+    }
+    return response.data;
   }
 
-  async getService(id: string, token: string | null): Promise<Service> {
-    const res = await this.networkClient.get(this.url(`/vendor/services/${id}`), {
-      headers: authHeaders(token),
-    });
-    return res.data;
+  async getService(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Service>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Service>>(
+      buildUrl(this.baseUrl, `vendor/services/${id}`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get service');
+    }
+    return response.data;
   }
 
-  async createService(data: ServiceCreateRequest, token: string | null): Promise<Service> {
-    const res = await this.networkClient.post(this.url('/vendor/services'), data, {
-      headers: authHeaders(token),
-    });
-    return res.data;
+  async createService(
+    data: ServiceCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Service>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<Service>>(
+      buildUrl(this.baseUrl, 'vendor/services'),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create service');
+    }
+    return response.data;
   }
 
   async updateService(
     id: string,
     data: ServiceUpdateRequest,
-    token: string | null
-  ): Promise<Service> {
-    const res = await this.networkClient.put(this.url(`/vendor/services/${id}`), data, {
-      headers: authHeaders(token),
-    });
-    return res.data;
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Service>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<BaseResponse<Service>>(
+      buildUrl(this.baseUrl, `vendor/services/${id}`),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update service');
+    }
+    return response.data;
   }
 
-  async deleteService(id: string, token: string | null): Promise<void> {
-    await this.networkClient.delete(this.url(`/vendor/services/${id}`), {
-      headers: authHeaders(token),
-    });
+  async deleteService(id: string, token: FirebaseIdToken): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/services/${id}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete service');
+    }
   }
 
   // =========================================================================
   // Vendor: Orders & Analytics
   // =========================================================================
 
-  async getOrders(token: string | null, limit = 50): Promise<OrderDetailed[]> {
-    const res = await this.networkClient.get(
-      this.url(`/vendor/orders?limit=${limit}`),
-      { headers: authHeaders(token) }
-    );
-    return res.data;
+  async getOrders(
+    token: FirebaseIdToken,
+    limit = 50
+  ): Promise<BaseResponse<OrderDetailed[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<OrderDetailed[]>
+    >(buildUrl(this.baseUrl, `vendor/orders?limit=${limit}`), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get orders');
+    }
+    return response.data;
   }
 
-  async getOrderStats(token: string | null): Promise<DashboardStats> {
-    const res = await this.networkClient.get(this.url('/vendor/orders/stats'), {
-      headers: authHeaders(token),
-    });
-    return res.data;
+  async getOrderStats(
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<DashboardStats>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<DashboardStats>
+    >(buildUrl(this.baseUrl, 'vendor/orders/stats'), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get order stats');
+    }
+    return response.data;
   }
 
-  async generateQr(walletAddress: string, token: string | null): Promise<QrCodeResponse> {
-    const res = await this.networkClient.get(
-      this.url(`/vendor/qr/${walletAddress}`),
-      { headers: authHeaders(token) }
-    );
-    return res.data;
+  async generateQr(
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<QrCodeResponse>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<QrCodeResponse>
+    >(buildUrl(this.baseUrl, `vendor/qr/${walletAddress}`), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'generate QR');
+    }
+    return response.data;
   }
 
   // =========================================================================
   // Buyer: Devices
   // =========================================================================
 
-  async verifyDevice(data: DeviceVerifyRequest, token: string | null): Promise<DeviceVerifyResponse> {
-    const res = await this.networkClient.post(this.url('/buyer/devices/verify'), data, {
-      headers: authHeaders(token),
-    });
-    return res.data;
+  async verifyDevice(
+    data: DeviceVerifyRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<DeviceVerifyResponse>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<DeviceVerifyResponse>
+    >(buildUrl(this.baseUrl, 'buyer/devices/verify'), data, { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'verify device');
+    }
+    return response.data;
   }
 
   // =========================================================================
   // Buyer: Orders & Payments
   // =========================================================================
 
-  async createOrder(data: CreateOrderRequest, token: string | null): Promise<Order> {
-    const res = await this.networkClient.post(this.url('/buyer/orders'), data, {
-      headers: authHeaders(token),
-    });
-    return res.data;
-  }
-
-  async getOrder(id: string, token: string | null): Promise<Order> {
-    const res = await this.networkClient.get(this.url(`/buyer/orders/${id}`), {
-      headers: authHeaders(token),
-    });
-    return res.data;
-  }
-
-  async processPayment(data: ProcessPaymentRequest, token: string | null): Promise<Order> {
-    const res = await this.networkClient.post(
-      this.url(`/buyer/orders/${data.orderId}/pay`),
+  async createOrder(
+    data: CreateOrderRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Order>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<Order>>(
+      buildUrl(this.baseUrl, 'buyer/orders'),
       data,
-      { headers: authHeaders(token) }
+      { headers }
     );
-    return res.data;
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create order');
+    }
+    return response.data;
+  }
+
+  async getOrder(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Order>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Order>>(
+      buildUrl(this.baseUrl, `buyer/orders/${id}`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get order');
+    }
+    return response.data;
+  }
+
+  async processPayment(
+    data: ProcessPaymentRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Order>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<Order>>(
+      buildUrl(this.baseUrl, `buyer/orders/${data.orderId}/pay`),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'process payment');
+    }
+    return response.data;
   }
 
   // =========================================================================
@@ -213,31 +335,48 @@ export class TapayokaClient {
 
   async createAuthorization(
     data: CreateAuthorizationRequest,
-    token: string | null
-  ): Promise<AuthorizationResponse> {
-    const res = await this.networkClient.post(
-      this.url('/buyer/authorizations'),
-      data,
-      { headers: authHeaders(token) }
-    );
-    return res.data;
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<AuthorizationResponse>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<AuthorizationResponse>
+    >(buildUrl(this.baseUrl, 'buyer/authorizations'), data, { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create authorization');
+    }
+    return response.data;
   }
 
-  async getAuthorization(orderId: string, token: string | null): Promise<AuthorizationResponse> {
-    const res = await this.networkClient.get(
-      this.url(`/buyer/authorizations/${orderId}`),
-      { headers: authHeaders(token) }
-    );
-    return res.data;
+  async getAuthorization(
+    orderId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<AuthorizationResponse>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<AuthorizationResponse>
+    >(buildUrl(this.baseUrl, `buyer/authorizations/${orderId}`), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get authorization');
+    }
+    return response.data;
   }
 
   // =========================================================================
   // Buyer: Telemetry
   // =========================================================================
 
-  async reportTelemetry(data: TelemetryEventRequest, token: string | null): Promise<void> {
-    await this.networkClient.post(this.url('/buyer/telemetry'), data, {
-      headers: authHeaders(token),
-    });
+  async reportTelemetry(
+    data: TelemetryEventRequest,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post(
+      buildUrl(this.baseUrl, 'buyer/telemetry'),
+      data,
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'report telemetry');
+    }
   }
 }

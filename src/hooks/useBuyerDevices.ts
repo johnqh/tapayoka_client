@@ -13,12 +13,14 @@ export const useBuyerDevices = (
   const [deviceInfo, setDeviceInfo] = useState<DeviceVerifyResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const client = new TapayokaClient(networkClient, baseUrl);
+  const client = new TapayokaClient({ networkClient, baseUrl });
 
   const verifyDevice = useCallback(async (data: DeviceVerifyRequest): Promise<DeviceVerifyResponse | null> => {
+    if (!token) return null;
     try {
       setIsLoading(true); setError(null);
-      const result = await client.verifyDevice(data, token);
+      const response = await client.verifyDevice(data, token);
+      const result = response.data ?? null;
       setDeviceInfo(result);
       return result;
     } catch (err: unknown) {

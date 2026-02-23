@@ -14,24 +14,26 @@ export const useOrders = (
   const [orders, setOrders] = useState<OrderDetailed[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const client = new TapayokaClient(networkClient, baseUrl);
+  const client = new TapayokaClient({ networkClient, baseUrl });
   const enabled = options?.enabled !== false && !!token;
 
   const refresh = useCallback(async () => {
-    if (!enabled) return;
+    if (!enabled || !token) return;
     try {
       setIsLoading(true); setError(null);
-      const data = await client.getOrders(token);
-      setOrders(data);
+      const response = await client.getOrders(token);
+      setOrders(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load orders');
     } finally { setIsLoading(false); }
   }, [token, enabled]);
 
   const createOrder = useCallback(async (data: CreateOrderRequest): Promise<Order | null> => {
+    if (!token) return null;
     try {
       setError(null);
-      return await client.createOrder(data, token);
+      const response = await client.createOrder(data, token);
+      return response.data ?? null;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to create order');
       return null;
@@ -39,9 +41,11 @@ export const useOrders = (
   }, [token]);
 
   const processPayment = useCallback(async (data: ProcessPaymentRequest): Promise<Order | null> => {
+    if (!token) return null;
     try {
       setError(null);
-      return await client.processPayment(data, token);
+      const response = await client.processPayment(data, token);
+      return response.data ?? null;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to process payment');
       return null;

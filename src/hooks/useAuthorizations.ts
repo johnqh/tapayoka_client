@@ -12,12 +12,14 @@ export const useAuthorizations = (
 ) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const client = new TapayokaClient(networkClient, baseUrl);
+  const client = new TapayokaClient({ networkClient, baseUrl });
 
   const createAuthorization = useCallback(async (orderId: string): Promise<AuthorizationResponse | null> => {
+    if (!token) return null;
     try {
       setIsLoading(true); setError(null);
-      return await client.createAuthorization({ orderId }, token);
+      const response = await client.createAuthorization({ orderId }, token);
+      return response.data ?? null;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to create authorization');
       return null;
@@ -25,9 +27,11 @@ export const useAuthorizations = (
   }, [token]);
 
   const getAuthorization = useCallback(async (orderId: string): Promise<AuthorizationResponse | null> => {
+    if (!token) return null;
     try {
       setIsLoading(true); setError(null);
-      return await client.getAuthorization(orderId, token);
+      const response = await client.getAuthorization(orderId, token);
+      return response.data ?? null;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to get authorization');
       return null;

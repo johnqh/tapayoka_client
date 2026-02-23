@@ -10,6 +10,15 @@ export default [
       parser: typescriptParser,
       ecmaVersion: 2020,
       sourceType: 'module',
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        fetch: 'readonly',
+      },
     },
     plugins: { '@typescript-eslint': typescript },
     rules: {
@@ -20,5 +29,20 @@ export default [
       'no-console': 'off',
       'prefer-const': 'error',
     },
+  },
+  {
+    files: ['**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    ignores: [
+      'dist/',
+      'node_modules/',
+      '*.d.ts',
+      'coverage/',
+      '.github/',
+    ],
   },
 ];

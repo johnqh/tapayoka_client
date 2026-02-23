@@ -14,25 +14,27 @@ export const useServices = (
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const client = new TapayokaClient(networkClient, baseUrl);
+  const client = new TapayokaClient({ networkClient, baseUrl });
   const enabled = options?.enabled !== false && !!token;
 
   const refresh = useCallback(async () => {
-    if (!enabled) return;
+    if (!enabled || !token) return;
     try {
       setIsLoading(true); setError(null);
-      const data = await client.getServices(token);
-      setServices(data);
+      const response = await client.getServices(token);
+      setServices(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load services');
     } finally { setIsLoading(false); }
   }, [token, enabled]);
 
   const createService = useCallback(async (data: ServiceCreateRequest) => {
+    if (!token) return null;
     try {
       setError(null);
-      const svc = await client.createService(data, token);
-      setServices(prev => [...prev, svc]);
+      const response = await client.createService(data, token);
+      const svc = response.data ?? null;
+      if (svc) setServices(prev => [...prev, svc]);
       return svc;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to create service');
@@ -41,10 +43,12 @@ export const useServices = (
   }, [token]);
 
   const updateService = useCallback(async (id: string, data: ServiceUpdateRequest) => {
+    if (!token) return null;
     try {
       setError(null);
-      const updated = await client.updateService(id, data, token);
-      setServices(prev => prev.map(s => s.id === id ? updated : s));
+      const response = await client.updateService(id, data, token);
+      const updated = response.data ?? null;
+      if (updated) setServices(prev => prev.map(s => s.id === id ? updated : s));
       return updated;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to update service');
@@ -53,6 +57,7 @@ export const useServices = (
   }, [token]);
 
   const deleteService = useCallback(async (id: string) => {
+    if (!token) return false;
     try {
       setError(null);
       await client.deleteService(id, token);

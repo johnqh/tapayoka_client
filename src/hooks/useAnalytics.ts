@@ -14,15 +14,15 @@ export const useAnalytics = (
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const client = new TapayokaClient(networkClient, baseUrl);
+  const client = new TapayokaClient({ networkClient, baseUrl });
   const enabled = options?.enabled !== false && !!token;
 
   const refresh = useCallback(async () => {
-    if (!enabled) return;
+    if (!enabled || !token) return;
     try {
       setIsLoading(true); setError(null);
-      const data = await client.getOrderStats(token);
-      setStats(data);
+      const response = await client.getOrderStats(token);
+      setStats(response.data ?? null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
     } finally { setIsLoading(false); }

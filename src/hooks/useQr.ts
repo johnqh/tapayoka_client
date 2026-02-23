@@ -13,12 +13,14 @@ export const useQr = (
   const [qrData, setQrData] = useState<QrCodeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const client = new TapayokaClient(networkClient, baseUrl);
+  const client = new TapayokaClient({ networkClient, baseUrl });
 
   const generateQr = useCallback(async (walletAddress: string): Promise<QrCodeResponse | null> => {
+    if (!token) return null;
     try {
       setIsLoading(true); setError(null);
-      const data = await client.generateQr(walletAddress, token);
+      const response = await client.generateQr(walletAddress, token);
+      const data = response.data ?? null;
       setQrData(data);
       return data;
     } catch (err: unknown) {
