@@ -1,0 +1,1 @@
+export { TapayokaClient } from './TapayokaClient';
