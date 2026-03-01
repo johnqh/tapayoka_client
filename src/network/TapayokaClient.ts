@@ -18,6 +18,20 @@ import type {
   CreateAuthorizationRequest,
   TelemetryEventRequest,
   DeviceServiceAssignRequest,
+  VendorLocation,
+  VendorEquipmentCategory,
+  VendorService,
+  VendorServiceControl,
+  VendorEquipment,
+  VendorLocationCreateRequest,
+  VendorLocationUpdateRequest,
+  VendorEquipmentCategoryCreateRequest,
+  VendorEquipmentCategoryUpdateRequest,
+  VendorServiceCreateRequest,
+  VendorServiceUpdateRequest,
+  VendorServiceControlCreateRequest,
+  VendorEquipmentCreateRequest,
+  VendorEquipmentUpdateRequest,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
 import { buildUrl, createAuthHeaders, handleApiError } from '../utils/index';
@@ -377,6 +391,391 @@ export class TapayokaClient {
     );
     if (!response.ok) {
       throw handleApiError(response, 'report telemetry');
+    }
+  }
+
+  // =========================================================================
+  // Vendor: Locations
+  // =========================================================================
+
+  async getVendorLocations(
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorLocation[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<VendorLocation[]>>(
+      buildUrl(this.baseUrl, 'vendor/locations'),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor locations');
+    }
+    return response.data;
+  }
+
+  async getVendorLocation(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorLocation>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<VendorLocation>>(
+      buildUrl(this.baseUrl, `vendor/locations/${id}`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor location');
+    }
+    return response.data;
+  }
+
+  async createVendorLocation(
+    data: VendorLocationCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorLocation>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<VendorLocation>>(
+      buildUrl(this.baseUrl, 'vendor/locations'),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create vendor location');
+    }
+    return response.data;
+  }
+
+  async updateVendorLocation(
+    id: string,
+    data: VendorLocationUpdateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorLocation>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<BaseResponse<VendorLocation>>(
+      buildUrl(this.baseUrl, `vendor/locations/${id}`),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update vendor location');
+    }
+    return response.data;
+  }
+
+  async deleteVendorLocation(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/locations/${id}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete vendor location');
+    }
+  }
+
+  async getVendorLocationServices(
+    locationId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorService[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<VendorService[]>>(
+      buildUrl(this.baseUrl, `vendor/locations/${locationId}/services`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor location services');
+    }
+    return response.data;
+  }
+
+  // =========================================================================
+  // Vendor: Equipment Categories
+  // =========================================================================
+
+  async getVendorEquipmentCategories(
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipmentCategory[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<VendorEquipmentCategory[]>
+    >(buildUrl(this.baseUrl, 'vendor/equipment-categories'), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor equipment categories');
+    }
+    return response.data;
+  }
+
+  async getVendorEquipmentCategory(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipmentCategory>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<VendorEquipmentCategory>
+    >(buildUrl(this.baseUrl, `vendor/equipment-categories/${id}`), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor equipment category');
+    }
+    return response.data;
+  }
+
+  async createVendorEquipmentCategory(
+    data: VendorEquipmentCategoryCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipmentCategory>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<VendorEquipmentCategory>
+    >(buildUrl(this.baseUrl, 'vendor/equipment-categories'), data, { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create vendor equipment category');
+    }
+    return response.data;
+  }
+
+  async updateVendorEquipmentCategory(
+    id: string,
+    data: VendorEquipmentCategoryUpdateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipmentCategory>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<
+      BaseResponse<VendorEquipmentCategory>
+    >(buildUrl(this.baseUrl, `vendor/equipment-categories/${id}`), data, {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update vendor equipment category');
+    }
+    return response.data;
+  }
+
+  async deleteVendorEquipmentCategory(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/equipment-categories/${id}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete vendor equipment category');
+    }
+  }
+
+  async getVendorEquipmentCategoryServices(
+    categoryId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorService[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<VendorService[]>>(
+      buildUrl(
+        this.baseUrl,
+        `vendor/equipment-categories/${categoryId}/services`
+      ),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor equipment category services');
+    }
+    return response.data;
+  }
+
+  // =========================================================================
+  // Vendor: Vendor Services (new model)
+  // =========================================================================
+
+  async getVendorService(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorService>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<VendorService>>(
+      buildUrl(this.baseUrl, `vendor/vendor-services/${id}`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor service');
+    }
+    return response.data;
+  }
+
+  async createVendorService(
+    data: VendorServiceCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorService>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<VendorService>>(
+      buildUrl(this.baseUrl, 'vendor/vendor-services'),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create vendor service');
+    }
+    return response.data;
+  }
+
+  async updateVendorService(
+    id: string,
+    data: VendorServiceUpdateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorService>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<BaseResponse<VendorService>>(
+      buildUrl(this.baseUrl, `vendor/vendor-services/${id}`),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update vendor service');
+    }
+    return response.data;
+  }
+
+  async deleteVendorService(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/vendor-services/${id}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete vendor service');
+    }
+  }
+
+  // =========================================================================
+  // Vendor: Service Controls
+  // =========================================================================
+
+  async getVendorServiceControls(
+    serviceId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorServiceControl[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<VendorServiceControl[]>
+    >(buildUrl(this.baseUrl, `vendor/service-controls/service/${serviceId}`), {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor service controls');
+    }
+    return response.data;
+  }
+
+  async createVendorServiceControl(
+    data: VendorServiceControlCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorServiceControl>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<VendorServiceControl>
+    >(buildUrl(this.baseUrl, 'vendor/service-controls'), data, { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create vendor service control');
+    }
+    return response.data;
+  }
+
+  async updateVendorServiceControl(
+    id: string,
+    data: { pinNumber?: number; duration?: number },
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorServiceControl>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<
+      BaseResponse<VendorServiceControl>
+    >(buildUrl(this.baseUrl, `vendor/service-controls/${id}`), data, {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update vendor service control');
+    }
+    return response.data;
+  }
+
+  async deleteVendorServiceControl(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/service-controls/${id}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete vendor service control');
+    }
+  }
+
+  // =========================================================================
+  // Vendor: Equipments
+  // =========================================================================
+
+  async getVendorEquipments(
+    serviceId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipment[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<VendorEquipment[]>
+    >(buildUrl(this.baseUrl, `vendor/equipments/service/${serviceId}`), {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor equipments');
+    }
+    return response.data;
+  }
+
+  async createVendorEquipment(
+    data: VendorEquipmentCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipment>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<VendorEquipment>
+    >(buildUrl(this.baseUrl, 'vendor/equipments'), data, { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create vendor equipment');
+    }
+    return response.data;
+  }
+
+  async updateVendorEquipment(
+    walletAddress: string,
+    data: VendorEquipmentUpdateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorEquipment>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<
+      BaseResponse<VendorEquipment>
+    >(buildUrl(this.baseUrl, `vendor/equipments/${walletAddress}`), data, {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update vendor equipment');
+    }
+    return response.data;
+  }
+
+  async deleteVendorEquipment(
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      buildUrl(this.baseUrl, `vendor/equipments/${walletAddress}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete vendor equipment');
     }
   }
 }

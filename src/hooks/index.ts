@@ -6,3 +6,8 @@ export { useBuyerDevices } from './useBuyerDevices';
 export { useAnalytics } from './useAnalytics';
 export { useQr } from './useQr';
 export { useEntities } from './useEntities';
+export { useVendorLocations } from './useVendorLocations';
+export { useVendorEquipmentCategories } from './useVendorEquipmentCategories';
+export { useVendorServices } from './useVendorServices';
+export { useVendorServiceControls } from './useVendorServiceControls';
+export { useVendorEquipments } from './useVendorEquipments';
