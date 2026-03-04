@@ -32,6 +32,7 @@ import type {
   VendorServiceControlCreateRequest,
   VendorEquipmentCreateRequest,
   VendorEquipmentUpdateRequest,
+  UserProfile,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
 import { buildUrl, createAuthHeaders, handleApiError } from '../utils/index';
@@ -45,14 +46,56 @@ export class TapayokaClient {
     this.networkClient = config.networkClient;
   }
 
+  private entityUrl(entitySlug: string, path: string): string {
+    return buildUrl(
+      this.baseUrl,
+      `entities/${encodeURIComponent(entitySlug)}/${path}`
+    );
+  }
+
+  // =========================================================================
+  // User
+  // =========================================================================
+
+  async getMe(token: FirebaseIdToken): Promise<BaseResponse<UserProfile>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<UserProfile>>(
+      buildUrl(this.baseUrl, 'me'),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get me');
+    }
+    return response.data;
+  }
+
+  async acceptTosAndCreateEntity(
+    data: { displayName?: string; acceptTos: true },
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<unknown>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<unknown>>(
+      buildUrl(this.baseUrl, 'entities'),
+      data,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'accept TOS and create entity');
+    }
+    return response.data;
+  }
+
   // =========================================================================
   // Vendor: Devices
   // =========================================================================
 
-  async getDevices(token: FirebaseIdToken): Promise<BaseResponse<Device[]>> {
+  async getDevices(
+    entitySlug: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Device[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<Device[]>>(
-      buildUrl(this.baseUrl, 'vendor/devices'),
+      this.entityUrl(entitySlug, 'devices'),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -62,12 +105,13 @@ export class TapayokaClient {
   }
 
   async getDevice(
+    entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Device>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<Device>>(
-      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}`),
+      this.entityUrl(entitySlug, `devices/${walletAddress}`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -77,12 +121,13 @@ export class TapayokaClient {
   }
 
   async createDevice(
+    entitySlug: string,
     data: DeviceCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Device>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<Device>>(
-      buildUrl(this.baseUrl, 'vendor/devices'),
+      this.entityUrl(entitySlug, 'devices'),
       data,
       { headers }
     );
@@ -93,13 +138,14 @@ export class TapayokaClient {
   }
 
   async updateDevice(
+    entitySlug: string,
     walletAddress: string,
     data: DeviceUpdateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Device>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<BaseResponse<Device>>(
-      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}`),
+      this.entityUrl(entitySlug, `devices/${walletAddress}`),
       data,
       { headers }
     );
@@ -110,12 +156,13 @@ export class TapayokaClient {
   }
 
   async deleteDevice(
+    entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}`),
+      this.entityUrl(entitySlug, `devices/${walletAddress}`),
       { headers }
     );
     if (!response.ok) {
@@ -124,12 +171,13 @@ export class TapayokaClient {
   }
 
   async getDeviceServices(
+    entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Service[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<Service[]>>(
-      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}/services`),
+      this.entityUrl(entitySlug, `devices/${walletAddress}/services`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -139,13 +187,14 @@ export class TapayokaClient {
   }
 
   async assignDeviceServices(
+    entitySlug: string,
     walletAddress: string,
     data: DeviceServiceAssignRequest,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put(
-      buildUrl(this.baseUrl, `vendor/devices/${walletAddress}/services`),
+      this.entityUrl(entitySlug, `devices/${walletAddress}/services`),
       data,
       { headers }
     );
@@ -158,10 +207,13 @@ export class TapayokaClient {
   // Vendor: Services
   // =========================================================================
 
-  async getServices(token: FirebaseIdToken): Promise<BaseResponse<Service[]>> {
+  async getServices(
+    entitySlug: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Service[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<Service[]>>(
-      buildUrl(this.baseUrl, 'vendor/services'),
+      this.entityUrl(entitySlug, 'services'),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -171,12 +223,13 @@ export class TapayokaClient {
   }
 
   async getService(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Service>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<Service>>(
-      buildUrl(this.baseUrl, `vendor/services/${id}`),
+      this.entityUrl(entitySlug, `services/${id}`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -186,12 +239,13 @@ export class TapayokaClient {
   }
 
   async createService(
+    entitySlug: string,
     data: ServiceCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Service>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<Service>>(
-      buildUrl(this.baseUrl, 'vendor/services'),
+      this.entityUrl(entitySlug, 'services'),
       data,
       { headers }
     );
@@ -202,13 +256,14 @@ export class TapayokaClient {
   }
 
   async updateService(
+    entitySlug: string,
     id: string,
     data: ServiceUpdateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<Service>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<BaseResponse<Service>>(
-      buildUrl(this.baseUrl, `vendor/services/${id}`),
+      this.entityUrl(entitySlug, `services/${id}`),
       data,
       { headers }
     );
@@ -218,10 +273,14 @@ export class TapayokaClient {
     return response.data;
   }
 
-  async deleteService(id: string, token: FirebaseIdToken): Promise<void> {
+  async deleteService(
+    entitySlug: string,
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/services/${id}`),
+      this.entityUrl(entitySlug, `services/${id}`),
       { headers }
     );
     if (!response.ok) {
@@ -234,13 +293,14 @@ export class TapayokaClient {
   // =========================================================================
 
   async getOrders(
+    entitySlug: string,
     token: FirebaseIdToken,
     limit = 50
   ): Promise<BaseResponse<OrderDetailed[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<OrderDetailed[]>
-    >(buildUrl(this.baseUrl, `vendor/orders?limit=${limit}`), { headers });
+    >(this.entityUrl(entitySlug, `orders?limit=${limit}`), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get orders');
     }
@@ -248,12 +308,13 @@ export class TapayokaClient {
   }
 
   async getOrderStats(
+    entitySlug: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<DashboardStats>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<DashboardStats>
-    >(buildUrl(this.baseUrl, 'vendor/orders/stats'), { headers });
+    >(this.entityUrl(entitySlug, 'orders/stats'), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get order stats');
     }
@@ -261,13 +322,14 @@ export class TapayokaClient {
   }
 
   async generateQr(
+    entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<QrCodeResponse>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<QrCodeResponse>
-    >(buildUrl(this.baseUrl, `vendor/qr/${walletAddress}`), { headers });
+    >(this.entityUrl(entitySlug, `qr/${walletAddress}`), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'generate QR');
     }
@@ -399,11 +461,12 @@ export class TapayokaClient {
   // =========================================================================
 
   async getVendorLocations(
+    entitySlug: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorLocation[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<VendorLocation[]>>(
-      buildUrl(this.baseUrl, 'vendor/locations'),
+      this.entityUrl(entitySlug, 'locations'),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -413,12 +476,13 @@ export class TapayokaClient {
   }
 
   async getVendorLocation(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorLocation>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<VendorLocation>>(
-      buildUrl(this.baseUrl, `vendor/locations/${id}`),
+      this.entityUrl(entitySlug, `locations/${id}`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -428,12 +492,13 @@ export class TapayokaClient {
   }
 
   async createVendorLocation(
+    entitySlug: string,
     data: VendorLocationCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorLocation>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<VendorLocation>>(
-      buildUrl(this.baseUrl, 'vendor/locations'),
+      this.entityUrl(entitySlug, 'locations'),
       data,
       { headers }
     );
@@ -444,13 +509,14 @@ export class TapayokaClient {
   }
 
   async updateVendorLocation(
+    entitySlug: string,
     id: string,
     data: VendorLocationUpdateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorLocation>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<BaseResponse<VendorLocation>>(
-      buildUrl(this.baseUrl, `vendor/locations/${id}`),
+      this.entityUrl(entitySlug, `locations/${id}`),
       data,
       { headers }
     );
@@ -461,12 +527,13 @@ export class TapayokaClient {
   }
 
   async deleteVendorLocation(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/locations/${id}`),
+      this.entityUrl(entitySlug, `locations/${id}`),
       { headers }
     );
     if (!response.ok) {
@@ -475,12 +542,13 @@ export class TapayokaClient {
   }
 
   async getVendorLocationServices(
+    entitySlug: string,
     locationId: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorService[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<VendorService[]>>(
-      buildUrl(this.baseUrl, `vendor/locations/${locationId}/services`),
+      this.entityUrl(entitySlug, `locations/${locationId}/services`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -494,12 +562,13 @@ export class TapayokaClient {
   // =========================================================================
 
   async getVendorEquipmentCategories(
+    entitySlug: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorEquipmentCategory[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<VendorEquipmentCategory[]>
-    >(buildUrl(this.baseUrl, 'vendor/equipment-categories'), { headers });
+    >(this.entityUrl(entitySlug, 'equipment-categories'), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor equipment categories');
     }
@@ -507,13 +576,14 @@ export class TapayokaClient {
   }
 
   async getVendorEquipmentCategory(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorEquipmentCategory>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<VendorEquipmentCategory>
-    >(buildUrl(this.baseUrl, `vendor/equipment-categories/${id}`), { headers });
+    >(this.entityUrl(entitySlug, `equipment-categories/${id}`), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor equipment category');
     }
@@ -521,13 +591,14 @@ export class TapayokaClient {
   }
 
   async createVendorEquipmentCategory(
+    entitySlug: string,
     data: VendorEquipmentCategoryCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorEquipmentCategory>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<VendorEquipmentCategory>
-    >(buildUrl(this.baseUrl, 'vendor/equipment-categories'), data, { headers });
+    >(this.entityUrl(entitySlug, 'equipment-categories'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create vendor equipment category');
     }
@@ -535,6 +606,7 @@ export class TapayokaClient {
   }
 
   async updateVendorEquipmentCategory(
+    entitySlug: string,
     id: string,
     data: VendorEquipmentCategoryUpdateRequest,
     token: FirebaseIdToken
@@ -542,7 +614,7 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<
       BaseResponse<VendorEquipmentCategory>
-    >(buildUrl(this.baseUrl, `vendor/equipment-categories/${id}`), data, {
+    >(this.entityUrl(entitySlug, `equipment-categories/${id}`), data, {
       headers,
     });
     if (!response.ok || !response.data) {
@@ -552,12 +624,13 @@ export class TapayokaClient {
   }
 
   async deleteVendorEquipmentCategory(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/equipment-categories/${id}`),
+      this.entityUrl(entitySlug, `equipment-categories/${id}`),
       { headers }
     );
     if (!response.ok) {
@@ -566,15 +639,13 @@ export class TapayokaClient {
   }
 
   async getVendorEquipmentCategoryServices(
+    entitySlug: string,
     categoryId: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorService[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<VendorService[]>>(
-      buildUrl(
-        this.baseUrl,
-        `vendor/equipment-categories/${categoryId}/services`
-      ),
+      this.entityUrl(entitySlug, `equipment-categories/${categoryId}/services`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -588,12 +659,13 @@ export class TapayokaClient {
   // =========================================================================
 
   async getVendorService(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorService>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<VendorService>>(
-      buildUrl(this.baseUrl, `vendor/vendor-services/${id}`),
+      this.entityUrl(entitySlug, `vendor-services/${id}`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -603,12 +675,13 @@ export class TapayokaClient {
   }
 
   async createVendorService(
+    entitySlug: string,
     data: VendorServiceCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorService>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<VendorService>>(
-      buildUrl(this.baseUrl, 'vendor/vendor-services'),
+      this.entityUrl(entitySlug, 'vendor-services'),
       data,
       { headers }
     );
@@ -619,13 +692,14 @@ export class TapayokaClient {
   }
 
   async updateVendorService(
+    entitySlug: string,
     id: string,
     data: VendorServiceUpdateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorService>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<BaseResponse<VendorService>>(
-      buildUrl(this.baseUrl, `vendor/vendor-services/${id}`),
+      this.entityUrl(entitySlug, `vendor-services/${id}`),
       data,
       { headers }
     );
@@ -636,12 +710,13 @@ export class TapayokaClient {
   }
 
   async deleteVendorService(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/vendor-services/${id}`),
+      this.entityUrl(entitySlug, `vendor-services/${id}`),
       { headers }
     );
     if (!response.ok) {
@@ -654,13 +729,14 @@ export class TapayokaClient {
   // =========================================================================
 
   async getVendorServiceControls(
+    entitySlug: string,
     serviceId: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorServiceControl[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<VendorServiceControl[]>
-    >(buildUrl(this.baseUrl, `vendor/service-controls/service/${serviceId}`), {
+    >(this.entityUrl(entitySlug, `service-controls/service/${serviceId}`), {
       headers,
     });
     if (!response.ok || !response.data) {
@@ -670,13 +746,14 @@ export class TapayokaClient {
   }
 
   async createVendorServiceControl(
+    entitySlug: string,
     data: VendorServiceControlCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorServiceControl>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<VendorServiceControl>
-    >(buildUrl(this.baseUrl, 'vendor/service-controls'), data, { headers });
+    >(this.entityUrl(entitySlug, 'service-controls'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create vendor service control');
     }
@@ -684,6 +761,7 @@ export class TapayokaClient {
   }
 
   async updateVendorServiceControl(
+    entitySlug: string,
     id: string,
     data: { pinNumber?: number; duration?: number },
     token: FirebaseIdToken
@@ -691,7 +769,7 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<
       BaseResponse<VendorServiceControl>
-    >(buildUrl(this.baseUrl, `vendor/service-controls/${id}`), data, {
+    >(this.entityUrl(entitySlug, `service-controls/${id}`), data, {
       headers,
     });
     if (!response.ok || !response.data) {
@@ -701,12 +779,13 @@ export class TapayokaClient {
   }
 
   async deleteVendorServiceControl(
+    entitySlug: string,
     id: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/service-controls/${id}`),
+      this.entityUrl(entitySlug, `service-controls/${id}`),
       { headers }
     );
     if (!response.ok) {
@@ -719,13 +798,14 @@ export class TapayokaClient {
   // =========================================================================
 
   async getVendorEquipments(
+    entitySlug: string,
     serviceId: string,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorEquipment[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<VendorEquipment[]>
-    >(buildUrl(this.baseUrl, `vendor/equipments/service/${serviceId}`), {
+    >(this.entityUrl(entitySlug, `equipments/service/${serviceId}`), {
       headers,
     });
     if (!response.ok || !response.data) {
@@ -735,13 +815,14 @@ export class TapayokaClient {
   }
 
   async createVendorEquipment(
+    entitySlug: string,
     data: VendorEquipmentCreateRequest,
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorEquipment>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<VendorEquipment>
-    >(buildUrl(this.baseUrl, 'vendor/equipments'), data, { headers });
+    >(this.entityUrl(entitySlug, 'equipments'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create vendor equipment');
     }
@@ -749,6 +830,7 @@ export class TapayokaClient {
   }
 
   async updateVendorEquipment(
+    entitySlug: string,
     walletAddress: string,
     data: VendorEquipmentUpdateRequest,
     token: FirebaseIdToken
@@ -756,7 +838,7 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<
       BaseResponse<VendorEquipment>
-    >(buildUrl(this.baseUrl, `vendor/equipments/${walletAddress}`), data, {
+    >(this.entityUrl(entitySlug, `equipments/${walletAddress}`), data, {
       headers,
     });
     if (!response.ok || !response.data) {
@@ -766,12 +848,13 @@ export class TapayokaClient {
   }
 
   async deleteVendorEquipment(
+    entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      buildUrl(this.baseUrl, `vendor/equipments/${walletAddress}`),
+      this.entityUrl(entitySlug, `equipments/${walletAddress}`),
       { headers }
     );
     if (!response.ok) {

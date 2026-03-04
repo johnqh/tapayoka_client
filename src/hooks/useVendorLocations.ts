@@ -22,7 +22,7 @@ export interface UseVendorLocationsReturn {
 export const useVendorLocations = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   options?: { enabled?: boolean }
 ): UseVendorLocationsReturn => {
@@ -31,28 +31,28 @@ export const useVendorLocations = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorLocations(token);
+      const response = await client.getVendorLocations(entitySlug!, token);
       setLocations(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load locations');
     } finally {
       setIsLoading(false);
     }
-  }, [token, enabled]);
+  }, [token, entitySlug, enabled]);
 
   const createLocation = useCallback(
     async (data: VendorLocationCreateRequest): Promise<VendorLocation | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorLocation(data, token);
+        const response = await client.createVendorLocation(entitySlug!, data, token);
         const location = response.data ?? null;
         if (location) setLocations(prev => [...prev, location]);
         return location;
@@ -61,7 +61,7 @@ export const useVendorLocations = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const updateLocation = useCallback(
@@ -69,7 +69,7 @@ export const useVendorLocations = (
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorLocation(id, data, token);
+        const response = await client.updateVendorLocation(entitySlug!, id, data, token);
         const updated = response.data ?? null;
         if (updated) setLocations(prev => prev.map(l => (l.id === id ? updated : l)));
         return updated;
@@ -78,7 +78,7 @@ export const useVendorLocations = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const deleteLocation = useCallback(
@@ -86,7 +86,7 @@ export const useVendorLocations = (
       if (!token) return false;
       try {
         setError(null);
-        await client.deleteVendorLocation(id, token);
+        await client.deleteVendorLocation(entitySlug!, id, token);
         setLocations(prev => prev.filter(l => l.id !== id));
         return true;
       } catch (err: unknown) {
@@ -94,7 +94,7 @@ export const useVendorLocations = (
         return false;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const clearError = useCallback(() => setError(null), []);

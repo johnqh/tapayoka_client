@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
   ANALYTICS: 'tapayoka-analytics',
   QR: 'tapayoka-qr',
   ENTITIES: 'tapayoka-entities',
+  ME: 'tapayoka-me',
   VENDOR_LOCATIONS: 'tapayoka-vendor-locations',
   VENDOR_LOCATION: 'tapayoka-vendor-location',
   VENDOR_EQUIPMENT_CATEGORIES: 'tapayoka-vendor-equipment-categories',

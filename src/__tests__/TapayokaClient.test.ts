@@ -31,6 +31,7 @@ describe('TapayokaClient', () => {
   let network: ReturnType<typeof createMockNetworkClient>;
   const baseUrl = 'https://api.example.com';
   const token = 'test-firebase-token';
+  const slug = 'my-org';
 
   const expectedHeaders = {
     'Content-Type': 'application/json',
@@ -48,9 +49,9 @@ describe('TapayokaClient', () => {
 
   describe('vendor device endpoints', () => {
     it('getDevices calls correct URL with auth headers', async () => {
-      const result = await client.getDevices(token);
+      const result = await client.getDevices(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/devices`,
+        `${baseUrl}/entities/${slug}/devices`,
         { headers: expectedHeaders }
       );
       expect(result.success).toBe(true);
@@ -66,9 +67,9 @@ describe('TapayokaClient', () => {
         success: true,
         data: { success: true, data: { walletAddress: '0xabc' } },
       });
-      const result = await client.getDevice('0xabc', token);
+      const result = await client.getDevice(slug, '0xabc', token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/devices/0xabc`,
+        `${baseUrl}/entities/${slug}/devices/0xabc`,
         { headers: expectedHeaders }
       );
       expect(result.data).toEqual({ walletAddress: '0xabc' });
@@ -84,9 +85,9 @@ describe('TapayokaClient', () => {
         success: true,
         data: { success: true, data: { walletAddress: '0xabc', label: 'Test' } },
       });
-      await client.createDevice(data as any, token);
+      await client.createDevice(slug, data as any, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/devices`,
+        `${baseUrl}/entities/${slug}/devices`,
         data,
         { headers: expectedHeaders }
       );
@@ -102,18 +103,18 @@ describe('TapayokaClient', () => {
         success: true,
         data: { success: true, data: { label: 'Updated' } },
       });
-      await client.updateDevice('0xabc', data as any, token);
+      await client.updateDevice(slug, '0xabc', data as any, token);
       expect(network.put).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/devices/0xabc`,
+        `${baseUrl}/entities/${slug}/devices/0xabc`,
         data,
         { headers: expectedHeaders }
       );
     });
 
     it('deleteDevice calls delete', async () => {
-      await client.deleteDevice('0xabc', token);
+      await client.deleteDevice(slug, '0xabc', token);
       expect(network.delete).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/devices/0xabc`,
+        `${baseUrl}/entities/${slug}/devices/0xabc`,
         { headers: expectedHeaders }
       );
     });
@@ -127,9 +128,9 @@ describe('TapayokaClient', () => {
         headers: {},
         success: true,
       });
-      await client.assignDeviceServices('0xabc', data, token);
+      await client.assignDeviceServices(slug, '0xabc', data, token);
       expect(network.put).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/devices/0xabc/services`,
+        `${baseUrl}/entities/${slug}/devices/0xabc/services`,
         data,
         { headers: expectedHeaders }
       );
@@ -138,9 +139,9 @@ describe('TapayokaClient', () => {
 
   describe('vendor service endpoints', () => {
     it('getServices calls correct URL', async () => {
-      await client.getServices(token);
+      await client.getServices(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/services`,
+        `${baseUrl}/entities/${slug}/services`,
         { headers: expectedHeaders }
       );
     });
@@ -159,18 +160,18 @@ describe('TapayokaClient', () => {
         success: true,
         data: { success: true, data: { id: 'svc-1', ...data } },
       });
-      await client.createService(data as any, token);
+      await client.createService(slug, data as any, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/services`,
+        `${baseUrl}/entities/${slug}/services`,
         data,
         { headers: expectedHeaders }
       );
     });
 
     it('deleteService calls delete', async () => {
-      await client.deleteService('svc-1', token);
+      await client.deleteService(slug, 'svc-1', token);
       expect(network.delete).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/services/svc-1`,
+        `${baseUrl}/entities/${slug}/services/svc-1`,
         { headers: expectedHeaders }
       );
     });
@@ -178,17 +179,17 @@ describe('TapayokaClient', () => {
 
   describe('vendor orders & analytics', () => {
     it('getOrders uses default limit', async () => {
-      await client.getOrders(token);
+      await client.getOrders(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/orders?limit=50`,
+        `${baseUrl}/entities/${slug}/orders?limit=50`,
         { headers: expectedHeaders }
       );
     });
 
     it('getOrders uses custom limit', async () => {
-      await client.getOrders(token, 10);
+      await client.getOrders(slug, token, 10);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/orders?limit=10`,
+        `${baseUrl}/entities/${slug}/orders?limit=10`,
         { headers: expectedHeaders }
       );
     });
@@ -202,9 +203,9 @@ describe('TapayokaClient', () => {
         success: true,
         data: { success: true, data: { totalDevices: 0 } },
       });
-      await client.getOrderStats(token);
+      await client.getOrderStats(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/orders/stats`,
+        `${baseUrl}/entities/${slug}/orders/stats`,
         { headers: expectedHeaders }
       );
     });
@@ -218,9 +219,9 @@ describe('TapayokaClient', () => {
         success: true,
         data: { success: true, data: { qrData: 'svg' } },
       });
-      await client.generateQr('0xabc', token);
+      await client.generateQr(slug, '0xabc', token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/vendor/qr/0xabc`,
+        `${baseUrl}/entities/${slug}/qr/0xabc`,
         { headers: expectedHeaders }
       );
     });
@@ -371,7 +372,7 @@ describe('TapayokaClient', () => {
         success: false,
         error: 'Not found',
       });
-      await expect(client.getDevices(token)).rejects.toThrow(
+      await expect(client.getDevices(slug, token)).rejects.toThrow(
         'Failed to get devices'
       );
     });
@@ -385,7 +386,7 @@ describe('TapayokaClient', () => {
         success: true,
         data: null,
       });
-      await expect(client.getDevices(token)).rejects.toThrow(
+      await expect(client.getDevices(slug, token)).rejects.toThrow(
         'Failed to get devices'
       );
     });

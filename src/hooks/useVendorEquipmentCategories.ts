@@ -22,7 +22,7 @@ export interface UseVendorEquipmentCategoriesReturn {
 export const useVendorEquipmentCategories = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   options?: { enabled?: boolean }
 ): UseVendorEquipmentCategoriesReturn => {
@@ -31,28 +31,28 @@ export const useVendorEquipmentCategories = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorEquipmentCategories(token);
+      const response = await client.getVendorEquipmentCategories(entitySlug!, token);
       setCategories(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load categories');
     } finally {
       setIsLoading(false);
     }
-  }, [token, enabled]);
+  }, [token, entitySlug, enabled]);
 
   const createCategory = useCallback(
     async (data: VendorEquipmentCategoryCreateRequest): Promise<VendorEquipmentCategory | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorEquipmentCategory(data, token);
+        const response = await client.createVendorEquipmentCategory(entitySlug!, data, token);
         const category = response.data ?? null;
         if (category) setCategories(prev => [...prev, category]);
         return category;
@@ -61,7 +61,7 @@ export const useVendorEquipmentCategories = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const updateCategory = useCallback(
@@ -69,7 +69,7 @@ export const useVendorEquipmentCategories = (
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorEquipmentCategory(id, data, token);
+        const response = await client.updateVendorEquipmentCategory(entitySlug!, id, data, token);
         const updated = response.data ?? null;
         if (updated) setCategories(prev => prev.map(c => (c.id === id ? updated : c)));
         return updated;
@@ -78,7 +78,7 @@ export const useVendorEquipmentCategories = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const deleteCategory = useCallback(
@@ -86,7 +86,7 @@ export const useVendorEquipmentCategories = (
       if (!token) return false;
       try {
         setError(null);
-        await client.deleteVendorEquipmentCategory(id, token);
+        await client.deleteVendorEquipmentCategory(entitySlug!, id, token);
         setCategories(prev => prev.filter(c => c.id !== id));
         return true;
       } catch (err: unknown) {
@@ -94,7 +94,7 @@ export const useVendorEquipmentCategories = (
         return false;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const clearError = useCallback(() => setError(null), []);

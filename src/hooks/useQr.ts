@@ -7,7 +7,7 @@ import type { FirebaseIdToken } from '../types';
 export const useQr = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null
 ) => {
   const [qrData, setQrData] = useState<QrCodeResponse | null>(null);
@@ -19,7 +19,7 @@ export const useQr = (
     if (!token) return null;
     try {
       setIsLoading(true); setError(null);
-      const response = await client.generateQr(walletAddress, token);
+      const response = await client.generateQr(entitySlug!, walletAddress, token);
       const data = response.data ?? null;
       setQrData(data);
       return data;
@@ -27,7 +27,7 @@ export const useQr = (
       setError(err instanceof Error ? err.message : 'Failed to generate QR');
       return null;
     } finally { setIsLoading(false); }
-  }, [token]);
+  }, [token, entitySlug]);
 
   const clearError = useCallback(() => setError(null), []);
 

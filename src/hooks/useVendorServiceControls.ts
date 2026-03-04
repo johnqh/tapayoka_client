@@ -22,7 +22,7 @@ export interface UseVendorServiceControlsReturn {
 export const useVendorServiceControls = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   serviceId: string | null,
   options?: { enabled?: boolean }
@@ -32,28 +32,28 @@ export const useVendorServiceControls = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token && !!serviceId;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug && !!serviceId;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token || !serviceId) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorServiceControls(serviceId, token);
+      const response = await client.getVendorServiceControls(entitySlug!, serviceId, token);
       setControls(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load service controls');
     } finally {
       setIsLoading(false);
     }
-  }, [token, enabled, serviceId]);
+  }, [token, entitySlug, enabled, serviceId]);
 
   const createControl = useCallback(
     async (data: VendorServiceControlCreateRequest): Promise<VendorServiceControl | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorServiceControl(data, token);
+        const response = await client.createVendorServiceControl(entitySlug!, data, token);
         const control = response.data ?? null;
         if (control) setControls(prev => [...prev, control]);
         return control;
@@ -62,7 +62,7 @@ export const useVendorServiceControls = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const updateControl = useCallback(
@@ -70,7 +70,7 @@ export const useVendorServiceControls = (
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorServiceControl(id, data, token);
+        const response = await client.updateVendorServiceControl(entitySlug!, id, data, token);
         const updated = response.data ?? null;
         if (updated) setControls(prev => prev.map(c => (c.id === id ? updated : c)));
         return updated;
@@ -79,7 +79,7 @@ export const useVendorServiceControls = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const deleteControl = useCallback(
@@ -87,7 +87,7 @@ export const useVendorServiceControls = (
       if (!token) return false;
       try {
         setError(null);
-        await client.deleteVendorServiceControl(id, token);
+        await client.deleteVendorServiceControl(entitySlug!, id, token);
         setControls(prev => prev.filter(c => c.id !== id));
         return true;
       } catch (err: unknown) {
@@ -95,7 +95,7 @@ export const useVendorServiceControls = (
         return false;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const clearError = useCallback(() => setError(null), []);

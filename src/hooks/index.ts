@@ -11,3 +11,4 @@ export { useVendorEquipmentCategories } from './useVendorEquipmentCategories';
 export { useVendorServices } from './useVendorServices';
 export { useVendorServiceControls } from './useVendorServiceControls';
 export { useVendorEquipments } from './useVendorEquipments';
+export { useMe } from './useMe';

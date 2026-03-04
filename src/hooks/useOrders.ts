@@ -7,7 +7,7 @@ import type { FirebaseIdToken } from '../types';
 export const useOrders = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   options?: { enabled?: boolean }
 ) => {
@@ -15,18 +15,18 @@ export const useOrders = (
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
       setIsLoading(true); setError(null);
-      const response = await client.getOrders(token);
+      const response = await client.getOrders(entitySlug!, token);
       setOrders(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load orders');
     } finally { setIsLoading(false); }
-  }, [token, enabled]);
+  }, [token, entitySlug, enabled]);
 
   const createOrder = useCallback(async (data: CreateOrderRequest): Promise<Order | null> => {
     if (!token) return null;
@@ -38,7 +38,7 @@ export const useOrders = (
       setError(err instanceof Error ? err.message : 'Failed to create order');
       return null;
     }
-  }, [token]);
+  }, [token, entitySlug]);
 
   const processPayment = useCallback(async (data: ProcessPaymentRequest): Promise<Order | null> => {
     if (!token) return null;
@@ -50,7 +50,7 @@ export const useOrders = (
       setError(err instanceof Error ? err.message : 'Failed to process payment');
       return null;
     }
-  }, [token]);
+  }, [token, entitySlug]);
 
   const clearError = useCallback(() => setError(null), []);
   useEffect(() => { refresh(); }, [refresh]);

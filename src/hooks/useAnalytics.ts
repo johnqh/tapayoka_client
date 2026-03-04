@@ -7,7 +7,7 @@ import type { FirebaseIdToken } from '../types';
 export const useAnalytics = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   options?: { enabled?: boolean; autoRefreshMs?: number }
 ) => {
@@ -15,18 +15,18 @@ export const useAnalytics = (
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
       setIsLoading(true); setError(null);
-      const response = await client.getOrderStats(token);
+      const response = await client.getOrderStats(entitySlug!, token);
       setStats(response.data ?? null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
     } finally { setIsLoading(false); }
-  }, [token, enabled]);
+  }, [token, entitySlug, enabled]);
 
   const clearError = useCallback(() => setError(null), []);
 

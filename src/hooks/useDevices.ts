@@ -18,7 +18,7 @@ export interface UseDevicesReturn {
 export const useDevices = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   options?: { enabled?: boolean }
 ): UseDevicesReturn => {
@@ -27,27 +27,27 @@ export const useDevices = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getDevices(token);
+      const response = await client.getDevices(entitySlug!, token);
       setDevices(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load devices');
     } finally {
       setIsLoading(false);
     }
-  }, [token, enabled]);
+  }, [token, entitySlug, enabled]);
 
   const createDevice = useCallback(async (data: DeviceCreateRequest): Promise<Device | null> => {
     if (!token) return null;
     try {
       setError(null);
-      const response = await client.createDevice(data, token);
+      const response = await client.createDevice(entitySlug!, data, token);
       const device = response.data ?? null;
       if (device) setDevices(prev => [...prev, device]);
       return device;
@@ -55,13 +55,13 @@ export const useDevices = (
       setError(err instanceof Error ? err.message : 'Failed to create device');
       return null;
     }
-  }, [token]);
+  }, [token, entitySlug]);
 
   const updateDevice = useCallback(async (walletAddress: string, data: DeviceUpdateRequest): Promise<Device | null> => {
     if (!token) return null;
     try {
       setError(null);
-      const response = await client.updateDevice(walletAddress, data, token);
+      const response = await client.updateDevice(entitySlug!, walletAddress, data, token);
       const updated = response.data ?? null;
       if (updated) setDevices(prev => prev.map(d => d.walletAddress === walletAddress ? updated : d));
       return updated;
@@ -69,20 +69,20 @@ export const useDevices = (
       setError(err instanceof Error ? err.message : 'Failed to update device');
       return null;
     }
-  }, [token]);
+  }, [token, entitySlug]);
 
   const deleteDevice = useCallback(async (walletAddress: string): Promise<boolean> => {
     if (!token) return false;
     try {
       setError(null);
-      await client.deleteDevice(walletAddress, token);
+      await client.deleteDevice(entitySlug!, walletAddress, token);
       setDevices(prev => prev.filter(d => d.walletAddress !== walletAddress));
       return true;
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to delete device');
       return false;
     }
-  }, [token]);
+  }, [token, entitySlug]);
 
   const clearError = useCallback(() => setError(null), []);
 

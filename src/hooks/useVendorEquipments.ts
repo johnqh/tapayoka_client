@@ -22,7 +22,7 @@ export interface UseVendorEquipmentsReturn {
 export const useVendorEquipments = (
   networkClient: NetworkClient,
   baseUrl: string,
-  _entitySlug: string | null,
+  entitySlug: string | null,
   token: FirebaseIdToken | null,
   serviceId: string | null,
   options?: { enabled?: boolean }
@@ -32,28 +32,28 @@ export const useVendorEquipments = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token && !!serviceId;
+  const enabled = options?.enabled !== false && !!token && !!entitySlug && !!serviceId;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token || !serviceId) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorEquipments(serviceId, token);
+      const response = await client.getVendorEquipments(entitySlug!, serviceId, token);
       setEquipments(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load equipments');
     } finally {
       setIsLoading(false);
     }
-  }, [token, enabled, serviceId]);
+  }, [token, entitySlug, enabled, serviceId]);
 
   const createEquipment = useCallback(
     async (data: VendorEquipmentCreateRequest): Promise<VendorEquipment | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorEquipment(data, token);
+        const response = await client.createVendorEquipment(entitySlug!, data, token);
         const equipment = response.data ?? null;
         if (equipment) setEquipments(prev => [...prev, equipment]);
         return equipment;
@@ -62,7 +62,7 @@ export const useVendorEquipments = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const updateEquipment = useCallback(
@@ -70,7 +70,7 @@ export const useVendorEquipments = (
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorEquipment(walletAddress, data, token);
+        const response = await client.updateVendorEquipment(entitySlug!, walletAddress, data, token);
         const updated = response.data ?? null;
         if (updated)
           setEquipments(prev =>
@@ -82,7 +82,7 @@ export const useVendorEquipments = (
         return null;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const deleteEquipment = useCallback(
@@ -90,7 +90,7 @@ export const useVendorEquipments = (
       if (!token) return false;
       try {
         setError(null);
-        await client.deleteVendorEquipment(walletAddress, token);
+        await client.deleteVendorEquipment(entitySlug!, walletAddress, token);
         setEquipments(prev => prev.filter(e => e.walletAddress !== walletAddress));
         return true;
       } catch (err: unknown) {
@@ -98,7 +98,7 @@ export const useVendorEquipments = (
         return false;
       }
     },
-    [token]
+    [token, entitySlug]
   );
 
   const clearError = useCallback(() => setError(null), []);
