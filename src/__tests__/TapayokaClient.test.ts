@@ -51,7 +51,7 @@ describe('TapayokaClient', () => {
     it('getDevices calls correct URL with auth headers', async () => {
       const result = await client.getDevices(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/devices`,
+        `${baseUrl}/api/v1/entities/${slug}/devices`,
         { headers: expectedHeaders }
       );
       expect(result.success).toBe(true);
@@ -69,7 +69,7 @@ describe('TapayokaClient', () => {
       });
       const result = await client.getDevice(slug, '0xabc', token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/devices/0xabc`,
+        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc`,
         { headers: expectedHeaders }
       );
       expect(result.data).toEqual({ walletAddress: '0xabc' });
@@ -87,7 +87,7 @@ describe('TapayokaClient', () => {
       });
       await client.createDevice(slug, data as any, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/devices`,
+        `${baseUrl}/api/v1/entities/${slug}/devices`,
         data,
         { headers: expectedHeaders }
       );
@@ -105,7 +105,7 @@ describe('TapayokaClient', () => {
       });
       await client.updateDevice(slug, '0xabc', data as any, token);
       expect(network.put).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/devices/0xabc`,
+        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc`,
         data,
         { headers: expectedHeaders }
       );
@@ -114,7 +114,7 @@ describe('TapayokaClient', () => {
     it('deleteDevice calls delete', async () => {
       await client.deleteDevice(slug, '0xabc', token);
       expect(network.delete).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/devices/0xabc`,
+        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc`,
         { headers: expectedHeaders }
       );
     });
@@ -130,7 +130,7 @@ describe('TapayokaClient', () => {
       });
       await client.assignDeviceServices(slug, '0xabc', data, token);
       expect(network.put).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/devices/0xabc/services`,
+        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc/services`,
         data,
         { headers: expectedHeaders }
       );
@@ -141,7 +141,7 @@ describe('TapayokaClient', () => {
     it('getServices calls correct URL', async () => {
       await client.getServices(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/services`,
+        `${baseUrl}/api/v1/entities/${slug}/services`,
         { headers: expectedHeaders }
       );
     });
@@ -162,7 +162,7 @@ describe('TapayokaClient', () => {
       });
       await client.createService(slug, data as any, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/services`,
+        `${baseUrl}/api/v1/entities/${slug}/services`,
         data,
         { headers: expectedHeaders }
       );
@@ -171,7 +171,7 @@ describe('TapayokaClient', () => {
     it('deleteService calls delete', async () => {
       await client.deleteService(slug, 'svc-1', token);
       expect(network.delete).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/services/svc-1`,
+        `${baseUrl}/api/v1/entities/${slug}/services/svc-1`,
         { headers: expectedHeaders }
       );
     });
@@ -181,7 +181,7 @@ describe('TapayokaClient', () => {
     it('getOrders uses default limit', async () => {
       await client.getOrders(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/orders?limit=50`,
+        `${baseUrl}/api/v1/entities/${slug}/orders?limit=50`,
         { headers: expectedHeaders }
       );
     });
@@ -189,7 +189,7 @@ describe('TapayokaClient', () => {
     it('getOrders uses custom limit', async () => {
       await client.getOrders(slug, token, 10);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/orders?limit=10`,
+        `${baseUrl}/api/v1/entities/${slug}/orders?limit=10`,
         { headers: expectedHeaders }
       );
     });
@@ -205,7 +205,7 @@ describe('TapayokaClient', () => {
       });
       await client.getOrderStats(slug, token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/orders/stats`,
+        `${baseUrl}/api/v1/entities/${slug}/orders/stats`,
         { headers: expectedHeaders }
       );
     });
@@ -221,7 +221,7 @@ describe('TapayokaClient', () => {
       });
       await client.generateQr(slug, '0xabc', token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/entities/${slug}/qr/0xabc`,
+        `${baseUrl}/api/v1/entities/${slug}/qr/0xabc`,
         { headers: expectedHeaders }
       );
     });
@@ -244,7 +244,7 @@ describe('TapayokaClient', () => {
       });
       await client.verifyDevice(data, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/devices/verify`,
+        `${baseUrl}/api/v1/buyer/devices/verify`,
         data,
         { headers: expectedHeaders }
       );
@@ -268,7 +268,7 @@ describe('TapayokaClient', () => {
       });
       await client.createOrder(data, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/orders`,
+        `${baseUrl}/api/v1/buyer/orders`,
         data,
         { headers: expectedHeaders }
       );
@@ -285,7 +285,7 @@ describe('TapayokaClient', () => {
       });
       await client.getOrder('order-1', token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/orders/order-1`,
+        `${baseUrl}/api/v1/buyer/orders/order-1`,
         { headers: expectedHeaders }
       );
     });
@@ -302,7 +302,7 @@ describe('TapayokaClient', () => {
       });
       await client.processPayment(data, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/orders/order-1/pay`,
+        `${baseUrl}/api/v1/buyer/orders/order-1/pay`,
         data,
         { headers: expectedHeaders }
       );
@@ -322,7 +322,7 @@ describe('TapayokaClient', () => {
       });
       await client.createAuthorization(data, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/authorizations`,
+        `${baseUrl}/api/v1/buyer/authorizations`,
         data,
         { headers: expectedHeaders }
       );
@@ -339,7 +339,7 @@ describe('TapayokaClient', () => {
       });
       await client.getAuthorization('order-1', token);
       expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/authorizations/order-1`,
+        `${baseUrl}/api/v1/buyer/authorizations/order-1`,
         { headers: expectedHeaders }
       );
     });
@@ -355,7 +355,7 @@ describe('TapayokaClient', () => {
       };
       await client.reportTelemetry(data, token);
       expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/buyer/telemetry`,
+        `${baseUrl}/api/v1/buyer/telemetry`,
         data,
         { headers: expectedHeaders }
       );

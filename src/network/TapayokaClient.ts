@@ -49,7 +49,7 @@ export class TapayokaClient {
   private entityUrl(entitySlug: string, path: string): string {
     return buildUrl(
       this.baseUrl,
-      `entities/${encodeURIComponent(entitySlug)}/${path}`
+      `/api/v1/entities/${encodeURIComponent(entitySlug)}/${path}`
     );
   }
 
@@ -60,7 +60,7 @@ export class TapayokaClient {
   async getMe(token: FirebaseIdToken): Promise<BaseResponse<UserProfile>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<UserProfile>>(
-      buildUrl(this.baseUrl, 'me'),
+      buildUrl(this.baseUrl, '/api/v1/me'),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -75,7 +75,7 @@ export class TapayokaClient {
   ): Promise<BaseResponse<unknown>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<unknown>>(
-      buildUrl(this.baseUrl, 'entities'),
+      buildUrl(this.baseUrl, '/api/v1/entities'),
       data,
       { headers }
     );
@@ -347,7 +347,7 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<DeviceVerifyResponse>
-    >(buildUrl(this.baseUrl, 'buyer/devices/verify'), data, { headers });
+    >(buildUrl(this.baseUrl, '/api/v1/buyer/devices/verify'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'verify device');
     }
@@ -364,7 +364,7 @@ export class TapayokaClient {
   ): Promise<BaseResponse<Order>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<Order>>(
-      buildUrl(this.baseUrl, 'buyer/orders'),
+      buildUrl(this.baseUrl, '/api/v1/buyer/orders'),
       data,
       { headers }
     );
@@ -380,7 +380,7 @@ export class TapayokaClient {
   ): Promise<BaseResponse<Order>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<BaseResponse<Order>>(
-      buildUrl(this.baseUrl, `buyer/orders/${id}`),
+      buildUrl(this.baseUrl, `/api/v1/buyer/orders/${id}`),
       { headers }
     );
     if (!response.ok || !response.data) {
@@ -395,7 +395,7 @@ export class TapayokaClient {
   ): Promise<BaseResponse<Order>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<BaseResponse<Order>>(
-      buildUrl(this.baseUrl, `buyer/orders/${data.orderId}/pay`),
+      buildUrl(this.baseUrl, `/api/v1/buyer/orders/${data.orderId}/pay`),
       data,
       { headers }
     );
@@ -416,7 +416,7 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<AuthorizationResponse>
-    >(buildUrl(this.baseUrl, 'buyer/authorizations'), data, { headers });
+    >(buildUrl(this.baseUrl, '/api/v1/buyer/authorizations'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create authorization');
     }
@@ -430,7 +430,7 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<AuthorizationResponse>
-    >(buildUrl(this.baseUrl, `buyer/authorizations/${orderId}`), { headers });
+    >(buildUrl(this.baseUrl, `/api/v1/buyer/authorizations/${orderId}`), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get authorization');
     }
@@ -447,7 +447,7 @@ export class TapayokaClient {
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post(
-      buildUrl(this.baseUrl, 'buyer/telemetry'),
+      buildUrl(this.baseUrl, '/api/v1/buyer/telemetry'),
       data,
       { headers }
     );
