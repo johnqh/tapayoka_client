@@ -65,6 +65,7 @@ export function handleApiError(
 ): TapayokaApiError {
   const resp = response as {
     status?: number;
+    error?: string;
     data?: {
       error?: string;
       message?: string;
@@ -73,7 +74,7 @@ export function handleApiError(
     };
   };
   const errorMessage =
-    resp?.data?.error || resp?.data?.message || 'Unknown error';
+    resp?.data?.error || resp?.data?.message || resp?.error || 'Unknown error';
   return new TapayokaApiError(`Failed to ${operation}: ${errorMessage}`, {
     statusCode: resp?.status,
     errorCode: resp?.data?.code,
