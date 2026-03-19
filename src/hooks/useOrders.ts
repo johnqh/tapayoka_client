@@ -1,6 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { NetworkClient } from '@sudobility/types';
-import type { Order, OrderDetailed, CreateOrderRequest, ProcessPaymentRequest } from '@sudobility/tapayoka_types';
+import type {
+  Order,
+  OrderDetailed,
+  CreateOrderRequest,
+  ProcessPaymentRequest,
+} from '@sudobility/tapayoka_types';
 import { TapayokaClient } from '../network/TapayokaClient';
 import type { FirebaseIdToken } from '../types';
 
@@ -20,40 +25,61 @@ export const useOrders = (
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
-      setIsLoading(true); setError(null);
+      setIsLoading(true);
+      setError(null);
       const response = await client.getOrders(entitySlug!, token);
       setOrders(response.data ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load orders');
-    } finally { setIsLoading(false); }
+    } finally {
+      setIsLoading(false);
+    }
   }, [token, entitySlug, enabled]);
 
-  const createOrder = useCallback(async (data: CreateOrderRequest): Promise<Order | null> => {
-    if (!token) return null;
-    try {
-      setError(null);
-      const response = await client.createOrder(data, token);
-      return response.data ?? null;
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create order');
-      return null;
-    }
-  }, [token, entitySlug]);
+  const createOrder = useCallback(
+    async (data: CreateOrderRequest): Promise<Order | null> => {
+      if (!token) return null;
+      try {
+        setError(null);
+        const response = await client.createOrder(data, token);
+        return response.data ?? null;
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to create order');
+        return null;
+      }
+    },
+    [token, entitySlug]
+  );
 
-  const processPayment = useCallback(async (data: ProcessPaymentRequest): Promise<Order | null> => {
-    if (!token) return null;
-    try {
-      setError(null);
-      const response = await client.processPayment(data, token);
-      return response.data ?? null;
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to process payment');
-      return null;
-    }
-  }, [token, entitySlug]);
+  const processPayment = useCallback(
+    async (data: ProcessPaymentRequest): Promise<Order | null> => {
+      if (!token) return null;
+      try {
+        setError(null);
+        const response = await client.processPayment(data, token);
+        return response.data ?? null;
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to process payment'
+        );
+        return null;
+      }
+    },
+    [token, entitySlug]
+  );
 
   const clearError = useCallback(() => setError(null), []);
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-  return { orders, isLoading, error, refresh, createOrder, processPayment, clearError };
+  return {
+    orders,
+    isLoading,
+    error,
+    refresh,
+    createOrder,
+    processPayment,
+    clearError,
+  };
 };

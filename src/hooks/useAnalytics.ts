@@ -20,17 +20,22 @@ export const useAnalytics = (
   const refresh = useCallback(async () => {
     if (!enabled || !token) return;
     try {
-      setIsLoading(true); setError(null);
+      setIsLoading(true);
+      setError(null);
       const response = await client.getOrderStats(entitySlug!, token);
       setStats(response.data ?? null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load analytics');
-    } finally { setIsLoading(false); }
+    } finally {
+      setIsLoading(false);
+    }
   }, [token, entitySlug, enabled]);
 
   const clearError = useCallback(() => setError(null), []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     if (!options?.autoRefreshMs || !enabled) return;

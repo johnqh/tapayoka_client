@@ -13,8 +13,13 @@ export interface UseVendorEquipmentsReturn {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  createEquipment: (data: VendorEquipmentCreateRequest) => Promise<VendorEquipment | null>;
-  updateEquipment: (walletAddress: string, data: VendorEquipmentUpdateRequest) => Promise<VendorEquipment | null>;
+  createEquipment: (
+    data: VendorEquipmentCreateRequest
+  ) => Promise<VendorEquipment | null>;
+  updateEquipment: (
+    walletAddress: string,
+    data: VendorEquipmentUpdateRequest
+  ) => Promise<VendorEquipment | null>;
   deleteEquipment: (walletAddress: string) => Promise<boolean>;
   clearError: () => void;
 }
@@ -32,33 +37,48 @@ export const useVendorEquipments = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token && !!entitySlug && !!serviceId;
+  const enabled =
+    options?.enabled !== false && !!token && !!entitySlug && !!serviceId;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token || !serviceId) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorEquipments(entitySlug!, serviceId, token);
+      const response = await client.getVendorEquipments(
+        entitySlug!,
+        serviceId,
+        token
+      );
       setEquipments(response.data ?? []);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to load equipments');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load equipments'
+      );
     } finally {
       setIsLoading(false);
     }
   }, [token, entitySlug, enabled, serviceId]);
 
   const createEquipment = useCallback(
-    async (data: VendorEquipmentCreateRequest): Promise<VendorEquipment | null> => {
+    async (
+      data: VendorEquipmentCreateRequest
+    ): Promise<VendorEquipment | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorEquipment(entitySlug!, data, token);
+        const response = await client.createVendorEquipment(
+          entitySlug!,
+          data,
+          token
+        );
         const equipment = response.data ?? null;
         if (equipment) setEquipments(prev => [...prev, equipment]);
         return equipment;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to create equipment');
+        setError(
+          err instanceof Error ? err.message : 'Failed to create equipment'
+        );
         return null;
       }
     },
@@ -66,11 +86,19 @@ export const useVendorEquipments = (
   );
 
   const updateEquipment = useCallback(
-    async (walletAddress: string, data: VendorEquipmentUpdateRequest): Promise<VendorEquipment | null> => {
+    async (
+      walletAddress: string,
+      data: VendorEquipmentUpdateRequest
+    ): Promise<VendorEquipment | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorEquipment(entitySlug!, walletAddress, data, token);
+        const response = await client.updateVendorEquipment(
+          entitySlug!,
+          walletAddress,
+          data,
+          token
+        );
         const updated = response.data ?? null;
         if (updated)
           setEquipments(prev =>
@@ -78,7 +106,9 @@ export const useVendorEquipments = (
           );
         return updated;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to update equipment');
+        setError(
+          err instanceof Error ? err.message : 'Failed to update equipment'
+        );
         return null;
       }
     },
@@ -91,10 +121,14 @@ export const useVendorEquipments = (
       try {
         setError(null);
         await client.deleteVendorEquipment(entitySlug!, walletAddress, token);
-        setEquipments(prev => prev.filter(e => e.walletAddress !== walletAddress));
+        setEquipments(prev =>
+          prev.filter(e => e.walletAddress !== walletAddress)
+        );
         return true;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to delete equipment');
+        setError(
+          err instanceof Error ? err.message : 'Failed to delete equipment'
+        );
         return false;
       }
     },
@@ -107,5 +141,14 @@ export const useVendorEquipments = (
     refresh();
   }, [refresh]);
 
-  return { equipments, isLoading, error, refresh, createEquipment, updateEquipment, deleteEquipment, clearError };
+  return {
+    equipments,
+    isLoading,
+    error,
+    refresh,
+    createEquipment,
+    updateEquipment,
+    deleteEquipment,
+    clearError,
+  };
 };

@@ -15,19 +15,29 @@ export const useQr = (
   const [error, setError] = useState<string | null>(null);
   const client = new TapayokaClient({ networkClient, baseUrl });
 
-  const generateQr = useCallback(async (walletAddress: string): Promise<QrCodeResponse | null> => {
-    if (!token) return null;
-    try {
-      setIsLoading(true); setError(null);
-      const response = await client.generateQr(entitySlug!, walletAddress, token);
-      const data = response.data ?? null;
-      setQrData(data);
-      return data;
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to generate QR');
-      return null;
-    } finally { setIsLoading(false); }
-  }, [token, entitySlug]);
+  const generateQr = useCallback(
+    async (walletAddress: string): Promise<QrCodeResponse | null> => {
+      if (!token) return null;
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await client.generateQr(
+          entitySlug!,
+          walletAddress,
+          token
+        );
+        const data = response.data ?? null;
+        setQrData(data);
+        return data;
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to generate QR');
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [token, entitySlug]
+  );
 
   const clearError = useCallback(() => setError(null), []);
 

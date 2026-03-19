@@ -83,7 +83,10 @@ describe('TapayokaClient', () => {
         statusText: 'Created',
         headers: {},
         success: true,
-        data: { success: true, data: { walletAddress: '0xabc', label: 'Test' } },
+        data: {
+          success: true,
+          data: { walletAddress: '0xabc', label: 'Test' },
+        },
       });
       await client.createDevice(slug, data as any, token);
       expect(network.post).toHaveBeenCalledWith(
@@ -318,7 +321,10 @@ describe('TapayokaClient', () => {
         statusText: 'Created',
         headers: {},
         success: true,
-        data: { success: true, data: { authorization: {}, payload: {}, serverSignature: '0x' } },
+        data: {
+          success: true,
+          data: { authorization: {}, payload: {}, serverSignature: '0x' },
+        },
       });
       await client.createAuthorization(data, token);
       expect(network.post).toHaveBeenCalledWith(
@@ -335,7 +341,10 @@ describe('TapayokaClient', () => {
         statusText: 'OK',
         headers: {},
         success: true,
-        data: { success: true, data: { authorization: {}, payload: {}, serverSignature: '0x' } },
+        data: {
+          success: true,
+          data: { authorization: {}, payload: {}, serverSignature: '0x' },
+        },
       });
       await client.getAuthorization('order-1', token);
       expect(network.get).toHaveBeenCalledWith(

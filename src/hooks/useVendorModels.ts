@@ -14,7 +14,10 @@ export interface UseVendorModelsReturn {
   error: string | null;
   refresh: () => Promise<void>;
   createModel: (data: VendorModelCreateRequest) => Promise<VendorModel | null>;
-  updateModel: (id: string, data: VendorModelUpdateRequest) => Promise<VendorModel | null>;
+  updateModel: (
+    id: string,
+    data: VendorModelUpdateRequest
+  ) => Promise<VendorModel | null>;
   deleteModel: (id: string) => Promise<boolean>;
   clearError: () => void;
 }
@@ -52,7 +55,11 @@ export const useVendorModels = (
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorModel(entitySlug!, data, token);
+        const response = await client.createVendorModel(
+          entitySlug!,
+          data,
+          token
+        );
         const model = response.data ?? null;
         if (model) setModels(prev => [...prev, model]);
         return model;
@@ -65,13 +72,22 @@ export const useVendorModels = (
   );
 
   const updateModel = useCallback(
-    async (id: string, data: VendorModelUpdateRequest): Promise<VendorModel | null> => {
+    async (
+      id: string,
+      data: VendorModelUpdateRequest
+    ): Promise<VendorModel | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorModel(entitySlug!, id, data, token);
+        const response = await client.updateVendorModel(
+          entitySlug!,
+          id,
+          data,
+          token
+        );
         const updated = response.data ?? null;
-        if (updated) setModels(prev => prev.map(c => (c.id === id ? updated : c)));
+        if (updated)
+          setModels(prev => prev.map(c => (c.id === id ? updated : c)));
         return updated;
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to update model');
@@ -103,5 +119,14 @@ export const useVendorModels = (
     refresh();
   }, [refresh]);
 
-  return { models, isLoading, error, refresh, createModel, updateModel, deleteModel, clearError };
+  return {
+    models,
+    isLoading,
+    error,
+    refresh,
+    createModel,
+    updateModel,
+    deleteModel,
+    clearError,
+  };
 };

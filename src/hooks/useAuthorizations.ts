@@ -14,31 +14,53 @@ export const useAuthorizations = (
   const [error, setError] = useState<string | null>(null);
   const client = new TapayokaClient({ networkClient, baseUrl });
 
-  const createAuthorization = useCallback(async (orderId: string): Promise<AuthorizationResponse | null> => {
-    if (!token) return null;
-    try {
-      setIsLoading(true); setError(null);
-      const response = await client.createAuthorization({ orderId }, token);
-      return response.data ?? null;
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create authorization');
-      return null;
-    } finally { setIsLoading(false); }
-  }, [token]);
+  const createAuthorization = useCallback(
+    async (orderId: string): Promise<AuthorizationResponse | null> => {
+      if (!token) return null;
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await client.createAuthorization({ orderId }, token);
+        return response.data ?? null;
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to create authorization'
+        );
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [token]
+  );
 
-  const getAuthorization = useCallback(async (orderId: string): Promise<AuthorizationResponse | null> => {
-    if (!token) return null;
-    try {
-      setIsLoading(true); setError(null);
-      const response = await client.getAuthorization(orderId, token);
-      return response.data ?? null;
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to get authorization');
-      return null;
-    } finally { setIsLoading(false); }
-  }, [token]);
+  const getAuthorization = useCallback(
+    async (orderId: string): Promise<AuthorizationResponse | null> => {
+      if (!token) return null;
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await client.getAuthorization(orderId, token);
+        return response.data ?? null;
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to get authorization'
+        );
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [token]
+  );
 
   const clearError = useCallback(() => setError(null), []);
 
-  return { isLoading, error, createAuthorization, getAuthorization, clearError };
+  return {
+    isLoading,
+    error,
+    createAuthorization,
+    getAuthorization,
+    clearError,
+  };
 };

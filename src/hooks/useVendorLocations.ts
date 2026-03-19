@@ -13,8 +13,13 @@ export interface UseVendorLocationsReturn {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  createLocation: (data: VendorLocationCreateRequest) => Promise<VendorLocation | null>;
-  updateLocation: (id: string, data: VendorLocationUpdateRequest) => Promise<VendorLocation | null>;
+  createLocation: (
+    data: VendorLocationCreateRequest
+  ) => Promise<VendorLocation | null>;
+  updateLocation: (
+    id: string,
+    data: VendorLocationUpdateRequest
+  ) => Promise<VendorLocation | null>;
   deleteLocation: (id: string) => Promise<boolean>;
   clearError: () => void;
 }
@@ -48,16 +53,24 @@ export const useVendorLocations = (
   }, [token, entitySlug, enabled]);
 
   const createLocation = useCallback(
-    async (data: VendorLocationCreateRequest): Promise<VendorLocation | null> => {
+    async (
+      data: VendorLocationCreateRequest
+    ): Promise<VendorLocation | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorLocation(entitySlug!, data, token);
+        const response = await client.createVendorLocation(
+          entitySlug!,
+          data,
+          token
+        );
         const location = response.data ?? null;
         if (location) setLocations(prev => [...prev, location]);
         return location;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to create location');
+        setError(
+          err instanceof Error ? err.message : 'Failed to create location'
+        );
         return null;
       }
     },
@@ -65,16 +78,27 @@ export const useVendorLocations = (
   );
 
   const updateLocation = useCallback(
-    async (id: string, data: VendorLocationUpdateRequest): Promise<VendorLocation | null> => {
+    async (
+      id: string,
+      data: VendorLocationUpdateRequest
+    ): Promise<VendorLocation | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorLocation(entitySlug!, id, data, token);
+        const response = await client.updateVendorLocation(
+          entitySlug!,
+          id,
+          data,
+          token
+        );
         const updated = response.data ?? null;
-        if (updated) setLocations(prev => prev.map(l => (l.id === id ? updated : l)));
+        if (updated)
+          setLocations(prev => prev.map(l => (l.id === id ? updated : l)));
         return updated;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to update location');
+        setError(
+          err instanceof Error ? err.message : 'Failed to update location'
+        );
         return null;
       }
     },
@@ -90,7 +114,9 @@ export const useVendorLocations = (
         setLocations(prev => prev.filter(l => l.id !== id));
         return true;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to delete location');
+        setError(
+          err instanceof Error ? err.message : 'Failed to delete location'
+        );
         return false;
       }
     },
@@ -103,5 +129,14 @@ export const useVendorLocations = (
     refresh();
   }, [refresh]);
 
-  return { locations, isLoading, error, refresh, createLocation, updateLocation, deleteLocation, clearError };
+  return {
+    locations,
+    isLoading,
+    error,
+    refresh,
+    createLocation,
+    updateLocation,
+    deleteLocation,
+    clearError,
+  };
 };

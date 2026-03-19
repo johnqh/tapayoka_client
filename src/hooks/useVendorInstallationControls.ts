@@ -13,8 +13,13 @@ export interface UseVendorInstallationControlsReturn {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  createControl: (data: VendorInstallationControlCreateRequest) => Promise<VendorInstallationControl | null>;
-  updateControl: (id: string, data: VendorInstallationControlUpdateRequest) => Promise<VendorInstallationControl | null>;
+  createControl: (
+    data: VendorInstallationControlCreateRequest
+  ) => Promise<VendorInstallationControl | null>;
+  updateControl: (
+    id: string,
+    data: VendorInstallationControlUpdateRequest
+  ) => Promise<VendorInstallationControl | null>;
   deleteControl: (id: string) => Promise<boolean>;
   clearError: () => void;
 }
@@ -32,33 +37,52 @@ export const useVendorInstallationControls = (
   const [error, setError] = useState<string | null>(null);
 
   const client = new TapayokaClient({ networkClient, baseUrl });
-  const enabled = options?.enabled !== false && !!token && !!entitySlug && !!installationId;
+  const enabled =
+    options?.enabled !== false && !!token && !!entitySlug && !!installationId;
 
   const refresh = useCallback(async () => {
     if (!enabled || !token || !installationId) return;
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorInstallationControls(entitySlug!, installationId, token);
+      const response = await client.getVendorInstallationControls(
+        entitySlug!,
+        installationId,
+        token
+      );
       setControls(response.data ?? []);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to load installation controls');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load installation controls'
+      );
     } finally {
       setIsLoading(false);
     }
   }, [token, entitySlug, enabled, installationId]);
 
   const createControl = useCallback(
-    async (data: VendorInstallationControlCreateRequest): Promise<VendorInstallationControl | null> => {
+    async (
+      data: VendorInstallationControlCreateRequest
+    ): Promise<VendorInstallationControl | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorInstallationControl(entitySlug!, data, token);
+        const response = await client.createVendorInstallationControl(
+          entitySlug!,
+          data,
+          token
+        );
         const control = response.data ?? null;
         if (control) setControls(prev => [...prev, control]);
         return control;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to create installation control');
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to create installation control'
+        );
         return null;
       }
     },
@@ -66,16 +90,29 @@ export const useVendorInstallationControls = (
   );
 
   const updateControl = useCallback(
-    async (id: string, data: VendorInstallationControlUpdateRequest): Promise<VendorInstallationControl | null> => {
+    async (
+      id: string,
+      data: VendorInstallationControlUpdateRequest
+    ): Promise<VendorInstallationControl | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorInstallationControl(entitySlug!, id, data, token);
+        const response = await client.updateVendorInstallationControl(
+          entitySlug!,
+          id,
+          data,
+          token
+        );
         const updated = response.data ?? null;
-        if (updated) setControls(prev => prev.map(c => (c.id === id ? updated : c)));
+        if (updated)
+          setControls(prev => prev.map(c => (c.id === id ? updated : c)));
         return updated;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to update installation control');
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to update installation control'
+        );
         return null;
       }
     },
@@ -91,7 +128,11 @@ export const useVendorInstallationControls = (
         setControls(prev => prev.filter(c => c.id !== id));
         return true;
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to delete installation control');
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to delete installation control'
+        );
         return false;
       }
     },
@@ -104,5 +145,14 @@ export const useVendorInstallationControls = (
     refresh();
   }, [refresh]);
 
-  return { controls, isLoading, error, refresh, createControl, updateControl, deleteControl, clearError };
+  return {
+    controls,
+    isLoading,
+    error,
+    refresh,
+    createControl,
+    updateControl,
+    deleteControl,
+    clearError,
+  };
 };

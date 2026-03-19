@@ -40,7 +40,9 @@ export const useEntities = (
 
   const clearError = useCallback(() => setError(null), []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { entities, isLoading, error, refresh, clearError };
 };

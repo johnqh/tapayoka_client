@@ -15,7 +15,7 @@ export interface UseMeReturn {
 export const useMe = (
   networkClient: NetworkClient,
   baseUrl: string,
-  token: FirebaseIdToken | null,
+  token: FirebaseIdToken | null
 ): UseMeReturn => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,9 @@ export const useMe = (
 
   const clearError = useCallback(() => setError(null), []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { profile, isLoading, error, refresh, clearError };
 };

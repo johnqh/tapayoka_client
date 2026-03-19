@@ -312,9 +312,10 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<DashboardStats>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<DashboardStats>
-    >(this.entityUrl(entitySlug, 'orders/stats'), { headers });
+    const response = await this.networkClient.get<BaseResponse<DashboardStats>>(
+      this.entityUrl(entitySlug, 'orders/stats'),
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get order stats');
     }
@@ -327,9 +328,10 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<QrCodeResponse>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<QrCodeResponse>
-    >(this.entityUrl(entitySlug, `qr/${walletAddress}`), { headers });
+    const response = await this.networkClient.get<BaseResponse<QrCodeResponse>>(
+      this.entityUrl(entitySlug, `qr/${walletAddress}`),
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'generate QR');
     }
@@ -347,7 +349,9 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<DeviceVerifyResponse>
-    >(buildUrl(this.baseUrl, '/api/v1/buyer/devices/verify'), data, { headers });
+    >(buildUrl(this.baseUrl, '/api/v1/buyer/devices/verify'), data, {
+      headers,
+    });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'verify device');
     }
@@ -416,7 +420,9 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
       BaseResponse<AuthorizationResponse>
-    >(buildUrl(this.baseUrl, '/api/v1/buyer/authorizations'), data, { headers });
+    >(buildUrl(this.baseUrl, '/api/v1/buyer/authorizations'), data, {
+      headers,
+    });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create authorization');
     }
@@ -430,7 +436,9 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<AuthorizationResponse>
-    >(buildUrl(this.baseUrl, `/api/v1/buyer/authorizations/${orderId}`), { headers });
+    >(buildUrl(this.baseUrl, `/api/v1/buyer/authorizations/${orderId}`), {
+      headers,
+    });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get authorization');
     }
@@ -465,10 +473,9 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorLocation[]>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<VendorLocation[]>>(
-      this.entityUrl(entitySlug, 'locations'),
-      { headers }
-    );
+    const response = await this.networkClient.get<
+      BaseResponse<VendorLocation[]>
+    >(this.entityUrl(entitySlug, 'locations'), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor locations');
     }
@@ -497,11 +504,9 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorLocation>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<BaseResponse<VendorLocation>>(
-      this.entityUrl(entitySlug, 'locations'),
-      data,
-      { headers }
-    );
+    const response = await this.networkClient.post<
+      BaseResponse<VendorLocation>
+    >(this.entityUrl(entitySlug, 'locations'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create vendor location');
     }
@@ -547,10 +552,11 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorInstallation[]>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<VendorInstallation[]>>(
-      this.entityUrl(entitySlug, `locations/${locationId}/installations`),
-      { headers }
-    );
+    const response = await this.networkClient.get<
+      BaseResponse<VendorInstallation[]>
+    >(this.entityUrl(entitySlug, `locations/${locationId}/installations`), {
+      headers,
+    });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor location installations');
     }
@@ -566,9 +572,10 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorModel[]>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<VendorModel[]>
-    >(this.entityUrl(entitySlug, 'models'), { headers });
+    const response = await this.networkClient.get<BaseResponse<VendorModel[]>>(
+      this.entityUrl(entitySlug, 'models'),
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor models');
     }
@@ -581,9 +588,10 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorModel>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<VendorModel>
-    >(this.entityUrl(entitySlug, `models/${id}`), { headers });
+    const response = await this.networkClient.get<BaseResponse<VendorModel>>(
+      this.entityUrl(entitySlug, `models/${id}`),
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor model');
     }
@@ -596,9 +604,11 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorModel>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<
-      BaseResponse<VendorModel>
-    >(this.entityUrl(entitySlug, 'models'), data, { headers });
+    const response = await this.networkClient.post<BaseResponse<VendorModel>>(
+      this.entityUrl(entitySlug, 'models'),
+      data,
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create vendor model');
     }
@@ -612,11 +622,13 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorModel>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.put<
-      BaseResponse<VendorModel>
-    >(this.entityUrl(entitySlug, `models/${id}`), data, {
-      headers,
-    });
+    const response = await this.networkClient.put<BaseResponse<VendorModel>>(
+      this.entityUrl(entitySlug, `models/${id}`),
+      data,
+      {
+        headers,
+      }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'update vendor model');
     }
@@ -644,10 +656,11 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorInstallation[]>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<VendorInstallation[]>>(
-      this.entityUrl(entitySlug, `models/${modelId}/installations`),
-      { headers }
-    );
+    const response = await this.networkClient.get<
+      BaseResponse<VendorInstallation[]>
+    >(this.entityUrl(entitySlug, `models/${modelId}/installations`), {
+      headers,
+    });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor model installations');
     }
@@ -664,10 +677,9 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorInstallation>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<VendorInstallation>>(
-      this.entityUrl(entitySlug, `installations/${id}`),
-      { headers }
-    );
+    const response = await this.networkClient.get<
+      BaseResponse<VendorInstallation>
+    >(this.entityUrl(entitySlug, `installations/${id}`), { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor installation');
     }
@@ -680,11 +692,9 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorInstallation>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<BaseResponse<VendorInstallation>>(
-      this.entityUrl(entitySlug, 'installations'),
-      data,
-      { headers }
-    );
+    const response = await this.networkClient.post<
+      BaseResponse<VendorInstallation>
+    >(this.entityUrl(entitySlug, 'installations'), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create vendor installation');
     }
@@ -698,11 +708,9 @@ export class TapayokaClient {
     token: FirebaseIdToken
   ): Promise<BaseResponse<VendorInstallation>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.put<BaseResponse<VendorInstallation>>(
-      this.entityUrl(entitySlug, `installations/${id}`),
-      data,
-      { headers }
-    );
+    const response = await this.networkClient.put<
+      BaseResponse<VendorInstallation>
+    >(this.entityUrl(entitySlug, `installations/${id}`), data, { headers });
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'update vendor installation');
     }
@@ -736,9 +744,15 @@ export class TapayokaClient {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
       BaseResponse<VendorInstallationControl[]>
-    >(this.entityUrl(entitySlug, `installation-controls/installation/${installationId}`), {
-      headers,
-    });
+    >(
+      this.entityUrl(
+        entitySlug,
+        `installation-controls/installation/${installationId}`
+      ),
+      {
+        headers,
+      }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get vendor installation controls');
     }
