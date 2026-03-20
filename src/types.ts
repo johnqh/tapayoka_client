@@ -3,8 +3,8 @@ export type FirebaseIdToken = string;
 export const QUERY_KEYS = {
   DEVICES: 'tapayoka-devices',
   DEVICE: 'tapayoka-device',
-  INSTALLATIONS: 'tapayoka-installations',
-  INSTALLATION: 'tapayoka-installation',
+  OFFERINGS: 'tapayoka-offerings',
+  OFFERING: 'tapayoka-offering',
   ORDERS: 'tapayoka-orders',
   ORDER: 'tapayoka-order',
   AUTHORIZATIONS: 'tapayoka-authorizations',
@@ -17,8 +17,7 @@ export const QUERY_KEYS = {
   VENDOR_LOCATION: 'tapayoka-vendor-location',
   VENDOR_MODELS: 'tapayoka-vendor-models',
   VENDOR_MODEL: 'tapayoka-vendor-model',
-  VENDOR_INSTALLATIONS: 'tapayoka-vendor-installations',
-  VENDOR_INSTALLATION: 'tapayoka-vendor-installation',
-  VENDOR_INSTALLATION_CONTROLS: 'tapayoka-vendor-installation-controls',
+  VENDOR_OFFERINGS: 'tapayoka-vendor-offerings',
+  VENDOR_OFFERING: 'tapayoka-vendor-offering',
   VENDOR_EQUIPMENTS: 'tapayoka-vendor-equipments',
 } as const;

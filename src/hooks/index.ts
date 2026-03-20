@@ -1,5 +1,5 @@
 export { useDevices } from './useDevices';
-export { useInstallations } from './useInstallations';
+export { useOfferings } from './useOfferings';
 export { useOrders } from './useOrders';
 export { useAuthorizations } from './useAuthorizations';
 export { useBuyerDevices } from './useBuyerDevices';
@@ -8,7 +8,6 @@ export { useQr } from './useQr';
 export { useEntities } from './useEntities';
 export { useVendorLocations } from './useVendorLocations';
 export { useVendorModels } from './useVendorModels';
-export { useVendorInstallations } from './useVendorInstallations';
-export { useVendorInstallationControls } from './useVendorInstallationControls';
+export { useVendorOfferings } from './useVendorOfferings';
 export { useVendorEquipments } from './useVendorEquipments';
 export { useMe } from './useMe';

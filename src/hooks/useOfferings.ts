@@ -1,21 +1,21 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { NetworkClient } from '@sudobility/types';
 import type {
-  Installation,
-  InstallationCreateRequest,
-  InstallationUpdateRequest,
+  Offering,
+  OfferingCreateRequest,
+  OfferingUpdateRequest,
 } from '@sudobility/tapayoka_types';
 import { TapayokaClient } from '../network/TapayokaClient';
 import type { FirebaseIdToken } from '../types';
 
-export const useInstallations = (
+export const useOfferings = (
   networkClient: NetworkClient,
   baseUrl: string,
   entitySlug: string | null,
   token: FirebaseIdToken | null,
   options?: { enabled?: boolean }
 ) => {
-  const [installations, setInstallations] = useState<Installation[]>([]);
+  const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const client = new TapayokaClient({ networkClient, baseUrl });
@@ -26,33 +26,27 @@ export const useInstallations = (
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getInstallations(entitySlug!, token);
-      setInstallations(response.data ?? []);
+      const response = await client.getOfferings(entitySlug!, token);
+      setOfferings(response.data ?? []);
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load installations'
-      );
+      setError(err instanceof Error ? err.message : 'Failed to load offerings');
     } finally {
       setIsLoading(false);
     }
   }, [token, entitySlug, enabled]);
 
-  const createInstallation = useCallback(
-    async (data: InstallationCreateRequest) => {
+  const createOffering = useCallback(
+    async (data: OfferingCreateRequest) => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createInstallation(
-          entitySlug!,
-          data,
-          token
-        );
+        const response = await client.createOffering(entitySlug!, data, token);
         const inst = response.data ?? null;
-        if (inst) setInstallations(prev => [...prev, inst]);
+        if (inst) setOfferings(prev => [...prev, inst]);
         return inst;
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to create installation'
+          err instanceof Error ? err.message : 'Failed to create offering'
         );
         return null;
       }
@@ -60,12 +54,12 @@ export const useInstallations = (
     [token, entitySlug]
   );
 
-  const updateInstallation = useCallback(
-    async (id: string, data: InstallationUpdateRequest) => {
+  const updateOffering = useCallback(
+    async (id: string, data: OfferingUpdateRequest) => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateInstallation(
+        const response = await client.updateOffering(
           entitySlug!,
           id,
           data,
@@ -73,11 +67,11 @@ export const useInstallations = (
         );
         const updated = response.data ?? null;
         if (updated)
-          setInstallations(prev => prev.map(s => (s.id === id ? updated : s)));
+          setOfferings(prev => prev.map(s => (s.id === id ? updated : s)));
         return updated;
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to update installation'
+          err instanceof Error ? err.message : 'Failed to update offering'
         );
         return null;
       }
@@ -85,17 +79,17 @@ export const useInstallations = (
     [token, entitySlug]
   );
 
-  const deleteInstallation = useCallback(
+  const deleteOffering = useCallback(
     async (id: string) => {
       if (!token) return false;
       try {
         setError(null);
-        await client.deleteInstallation(entitySlug!, id, token);
-        setInstallations(prev => prev.filter(s => s.id !== id));
+        await client.deleteOffering(entitySlug!, id, token);
+        setOfferings(prev => prev.filter(s => s.id !== id));
         return true;
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to delete installation'
+          err instanceof Error ? err.message : 'Failed to delete offering'
         );
         return false;
       }
@@ -109,13 +103,13 @@ export const useInstallations = (
   }, [refresh]);
 
   return {
-    installations,
+    offerings,
     isLoading,
     error,
     refresh,
-    createInstallation,
-    updateInstallation,
-    deleteInstallation,
+    createOffering,
+    updateOffering,
+    deleteOffering,
     clearError,
   };
 };
