@@ -76,10 +76,10 @@ export const useVendorInstallations = (
         if (installation) setInstallations(prev => [...prev, installation]);
         return installation;
       } catch (err: unknown) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to create installation'
-        );
-        return null;
+        const message =
+          err instanceof Error ? err.message : 'Failed to create installation';
+        setError(message);
+        throw err;
       }
     },
     [token, entitySlug]
@@ -106,10 +106,10 @@ export const useVendorInstallations = (
           );
         return updated;
       } catch (err: unknown) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to update installation'
-        );
-        return null;
+        const message =
+          err instanceof Error ? err.message : 'Failed to update installation';
+        setError(message);
+        throw err;
       }
     },
     [token, entitySlug]
@@ -130,10 +130,10 @@ export const useVendorInstallations = (
         );
         return true;
       } catch (err: unknown) {
-        setError(
-          err instanceof Error ? err.message : 'Failed to delete installation'
-        );
-        return false;
+        const message =
+          err instanceof Error ? err.message : 'Failed to delete installation';
+        setError(message);
+        throw err;
       }
     },
     [token, entitySlug]
