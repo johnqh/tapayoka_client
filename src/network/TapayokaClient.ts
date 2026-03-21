@@ -479,6 +479,30 @@ export class TapayokaClient {
   }
 
   // =========================================================================
+  // Buyer: Slots
+  // =========================================================================
+
+  async getBuyerSlots(
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorInstallationSlot[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<VendorInstallationSlot[]>
+    >(
+      buildUrl(
+        this.baseUrl,
+        `/api/v1/buyer/slots/${encodeURIComponent(walletAddress)}`
+      ),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get buyer slots');
+    }
+    return response.data;
+  }
+
+  // =========================================================================
   // Vendor: Locations
   // =========================================================================
 
