@@ -443,6 +443,18 @@ export class TapayokaClient {
     return response.data;
   }
 
+  async getMyOrders(token: FirebaseIdToken): Promise<BaseResponse<Order[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<BaseResponse<Order[]>>(
+      buildUrl(this.baseUrl, '/api/v1/buyer/orders'),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get my orders');
+    }
+    return response.data;
+  }
+
   // =========================================================================
   // Buyer: Telemetry
   // =========================================================================

@@ -3,6 +3,7 @@ export { useOfferings } from './useOfferings';
 export { useOrders } from './useOrders';
 export { useAuthorizations } from './useAuthorizations';
 export { useBuyerDevices } from './useBuyerDevices';
+export { useBuyerOrders } from './useBuyerOrders';
 export { useAnalytics } from './useAnalytics';
 export { useQr } from './useQr';
 export { useEntities } from './useEntities';
