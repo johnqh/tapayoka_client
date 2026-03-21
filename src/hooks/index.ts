@@ -11,4 +11,5 @@ export { useVendorLocations } from './useVendorLocations';
 export { useVendorModels } from './useVendorModels';
 export { useVendorOfferings } from './useVendorOfferings';
 export { useVendorInstallations } from './useVendorInstallations';
+export { useVendorInstallationSlots } from './useVendorInstallationSlots';
 export { useMe } from './useMe';

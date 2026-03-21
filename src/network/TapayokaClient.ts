@@ -30,6 +30,10 @@ import type {
   VendorOfferingUpdateRequest,
   VendorInstallationCreateRequest,
   VendorInstallationUpdateRequest,
+  VendorInstallationSlot,
+  VendorInstallationSlotCreateRequest,
+  VendorInstallationSlotUpdateRequest,
+  VendorInstallationSlotBulkCreateRequest,
   UserProfile,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
@@ -811,6 +815,134 @@ export class TapayokaClient {
     );
     if (!response.ok) {
       throw handleApiError(response, 'delete vendor installation');
+    }
+  }
+
+  // =========================================================================
+  // Vendor: Installation Slots
+  // =========================================================================
+
+  async getVendorInstallationSlots(
+    entitySlug: string,
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorInstallationSlot[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<VendorInstallationSlot[]>
+    >(
+      this.entityUrl(
+        entitySlug,
+        `installation-slots/installation/${walletAddress}`
+      ),
+      {
+        headers,
+      }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get vendor installation slots');
+    }
+    return response.data;
+  }
+
+  async createVendorInstallationSlot(
+    entitySlug: string,
+    walletAddress: string,
+    data: VendorInstallationSlotCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorInstallationSlot>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<VendorInstallationSlot>
+    >(
+      this.entityUrl(
+        entitySlug,
+        `installation-slots/installation/${walletAddress}`
+      ),
+      data,
+      {
+        headers,
+      }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create vendor installation slot');
+    }
+    return response.data;
+  }
+
+  async bulkCreateVendorInstallationSlots(
+    entitySlug: string,
+    walletAddress: string,
+    data: VendorInstallationSlotBulkCreateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorInstallationSlot[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<VendorInstallationSlot[]>
+    >(
+      this.entityUrl(
+        entitySlug,
+        `installation-slots/installation/${walletAddress}/bulk`
+      ),
+      data,
+      {
+        headers,
+      }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'bulk create vendor installation slots');
+    }
+    return response.data;
+  }
+
+  async updateVendorInstallationSlot(
+    entitySlug: string,
+    slotId: string,
+    data: VendorInstallationSlotUpdateRequest,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<VendorInstallationSlot>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<
+      BaseResponse<VendorInstallationSlot>
+    >(this.entityUrl(entitySlug, `installation-slots/${slotId}`), data, {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'update vendor installation slot');
+    }
+    return response.data;
+  }
+
+  async deleteVendorInstallationSlot(
+    entitySlug: string,
+    slotId: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      this.entityUrl(entitySlug, `installation-slots/${slotId}`),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete vendor installation slot');
+    }
+  }
+
+  async deleteAllVendorInstallationSlots(
+    entitySlug: string,
+    walletAddress: string,
+    token: FirebaseIdToken
+  ): Promise<void> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete(
+      this.entityUrl(
+        entitySlug,
+        `installation-slots/installation/${walletAddress}`
+      ),
+      { headers }
+    );
+    if (!response.ok) {
+      throw handleApiError(response, 'delete all vendor installation slots');
     }
   }
 }
