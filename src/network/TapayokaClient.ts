@@ -21,15 +21,15 @@ import type {
   VendorLocation,
   VendorModel,
   VendorOffering,
-  VendorEquipment,
+  VendorInstallation,
   VendorLocationCreateRequest,
   VendorLocationUpdateRequest,
   VendorModelCreateRequest,
   VendorModelUpdateRequest,
   VendorOfferingCreateRequest,
   VendorOfferingUpdateRequest,
-  VendorEquipmentCreateRequest,
-  VendorEquipmentUpdateRequest,
+  VendorInstallationCreateRequest,
+  VendorInstallationUpdateRequest,
   UserProfile,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
@@ -734,71 +734,71 @@ export class TapayokaClient {
   }
 
   // =========================================================================
-  // Vendor: Equipments
+  // Vendor: Installations
   // =========================================================================
 
-  async getVendorEquipments(
+  async getVendorInstallations(
     entitySlug: string,
     serviceId: string,
     token: FirebaseIdToken
-  ): Promise<BaseResponse<VendorEquipment[]>> {
+  ): Promise<BaseResponse<VendorInstallation[]>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.get<
-      BaseResponse<VendorEquipment[]>
-    >(this.entityUrl(entitySlug, `equipments/service/${serviceId}`), {
+      BaseResponse<VendorInstallation[]>
+    >(this.entityUrl(entitySlug, `installations/service/${serviceId}`), {
       headers,
     });
     if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get vendor equipments');
+      throw handleApiError(response, 'get vendor installations');
     }
     return response.data;
   }
 
-  async createVendorEquipment(
+  async createVendorInstallation(
     entitySlug: string,
-    data: VendorEquipmentCreateRequest,
+    data: VendorInstallationCreateRequest,
     token: FirebaseIdToken
-  ): Promise<BaseResponse<VendorEquipment>> {
+  ): Promise<BaseResponse<VendorInstallation>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.post<
-      BaseResponse<VendorEquipment>
-    >(this.entityUrl(entitySlug, 'equipments'), data, { headers });
+      BaseResponse<VendorInstallation>
+    >(this.entityUrl(entitySlug, 'installations'), data, { headers });
     if (!response.ok || !response.data) {
-      throw handleApiError(response, 'create vendor equipment');
+      throw handleApiError(response, 'create vendor installation');
     }
     return response.data;
   }
 
-  async updateVendorEquipment(
+  async updateVendorInstallation(
     entitySlug: string,
     walletAddress: string,
-    data: VendorEquipmentUpdateRequest,
+    data: VendorInstallationUpdateRequest,
     token: FirebaseIdToken
-  ): Promise<BaseResponse<VendorEquipment>> {
+  ): Promise<BaseResponse<VendorInstallation>> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.put<
-      BaseResponse<VendorEquipment>
-    >(this.entityUrl(entitySlug, `equipments/${walletAddress}`), data, {
+      BaseResponse<VendorInstallation>
+    >(this.entityUrl(entitySlug, `installations/${walletAddress}`), data, {
       headers,
     });
     if (!response.ok || !response.data) {
-      throw handleApiError(response, 'update vendor equipment');
+      throw handleApiError(response, 'update vendor installation');
     }
     return response.data;
   }
 
-  async deleteVendorEquipment(
+  async deleteVendorInstallation(
     entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
   ): Promise<void> {
     const headers = createAuthHeaders(token);
     const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `equipments/${walletAddress}`),
+      this.entityUrl(entitySlug, `installations/${walletAddress}`),
       { headers }
     );
     if (!response.ok) {
-      throw handleApiError(response, 'delete vendor equipment');
+      throw handleApiError(response, 'delete vendor installation');
     }
   }
 }

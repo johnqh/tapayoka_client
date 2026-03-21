@@ -9,5 +9,5 @@ export { useEntities } from './useEntities';
 export { useVendorLocations } from './useVendorLocations';
 export { useVendorModels } from './useVendorModels';
 export { useVendorOfferings } from './useVendorOfferings';
-export { useVendorEquipments } from './useVendorEquipments';
+export { useVendorInstallations } from './useVendorInstallations';
 export { useMe } from './useMe';

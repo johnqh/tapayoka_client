@@ -1,38 +1,38 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { NetworkClient } from '@sudobility/types';
 import type {
-  VendorEquipment,
-  VendorEquipmentCreateRequest,
-  VendorEquipmentUpdateRequest,
+  VendorInstallation,
+  VendorInstallationCreateRequest,
+  VendorInstallationUpdateRequest,
 } from '@sudobility/tapayoka_types';
 import { TapayokaClient } from '../network/TapayokaClient';
 import type { FirebaseIdToken } from '../types';
 
-export interface UseVendorEquipmentsReturn {
-  equipments: VendorEquipment[];
+export interface UseVendorInstallationsReturn {
+  installations: VendorInstallation[];
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  createEquipment: (
-    data: VendorEquipmentCreateRequest
-  ) => Promise<VendorEquipment | null>;
-  updateEquipment: (
+  createInstallation: (
+    data: VendorInstallationCreateRequest
+  ) => Promise<VendorInstallation | null>;
+  updateInstallation: (
     walletAddress: string,
-    data: VendorEquipmentUpdateRequest
-  ) => Promise<VendorEquipment | null>;
-  deleteEquipment: (walletAddress: string) => Promise<boolean>;
+    data: VendorInstallationUpdateRequest
+  ) => Promise<VendorInstallation | null>;
+  deleteInstallation: (walletAddress: string) => Promise<boolean>;
   clearError: () => void;
 }
 
-export const useVendorEquipments = (
+export const useVendorInstallations = (
   networkClient: NetworkClient,
   baseUrl: string,
   entitySlug: string | null,
   token: FirebaseIdToken | null,
   serviceId: string | null,
   options?: { enabled?: boolean }
-): UseVendorEquipmentsReturn => {
-  const [equipments, setEquipments] = useState<VendorEquipment[]>([]);
+): UseVendorInstallationsReturn => {
+  const [installations, setInstallations] = useState<VendorInstallation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,39 +45,39 @@ export const useVendorEquipments = (
     try {
       setIsLoading(true);
       setError(null);
-      const response = await client.getVendorEquipments(
+      const response = await client.getVendorInstallations(
         entitySlug!,
         serviceId,
         token
       );
-      setEquipments(response.data ?? []);
+      setInstallations(response.data ?? []);
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : 'Failed to load equipments'
+        err instanceof Error ? err.message : 'Failed to load installations'
       );
     } finally {
       setIsLoading(false);
     }
   }, [token, entitySlug, enabled, serviceId]);
 
-  const createEquipment = useCallback(
+  const createInstallation = useCallback(
     async (
-      data: VendorEquipmentCreateRequest
-    ): Promise<VendorEquipment | null> => {
+      data: VendorInstallationCreateRequest
+    ): Promise<VendorInstallation | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.createVendorEquipment(
+        const response = await client.createVendorInstallation(
           entitySlug!,
           data,
           token
         );
-        const equipment = response.data ?? null;
-        if (equipment) setEquipments(prev => [...prev, equipment]);
-        return equipment;
+        const installation = response.data ?? null;
+        if (installation) setInstallations(prev => [...prev, installation]);
+        return installation;
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to create equipment'
+          err instanceof Error ? err.message : 'Failed to create installation'
         );
         return null;
       }
@@ -85,15 +85,15 @@ export const useVendorEquipments = (
     [token, entitySlug]
   );
 
-  const updateEquipment = useCallback(
+  const updateInstallation = useCallback(
     async (
       walletAddress: string,
-      data: VendorEquipmentUpdateRequest
-    ): Promise<VendorEquipment | null> => {
+      data: VendorInstallationUpdateRequest
+    ): Promise<VendorInstallation | null> => {
       if (!token) return null;
       try {
         setError(null);
-        const response = await client.updateVendorEquipment(
+        const response = await client.updateVendorInstallation(
           entitySlug!,
           walletAddress,
           data,
@@ -101,13 +101,13 @@ export const useVendorEquipments = (
         );
         const updated = response.data ?? null;
         if (updated)
-          setEquipments(prev =>
+          setInstallations(prev =>
             prev.map(e => (e.walletAddress === walletAddress ? updated : e))
           );
         return updated;
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to update equipment'
+          err instanceof Error ? err.message : 'Failed to update installation'
         );
         return null;
       }
@@ -115,19 +115,23 @@ export const useVendorEquipments = (
     [token, entitySlug]
   );
 
-  const deleteEquipment = useCallback(
+  const deleteInstallation = useCallback(
     async (walletAddress: string): Promise<boolean> => {
       if (!token) return false;
       try {
         setError(null);
-        await client.deleteVendorEquipment(entitySlug!, walletAddress, token);
-        setEquipments(prev =>
+        await client.deleteVendorInstallation(
+          entitySlug!,
+          walletAddress,
+          token
+        );
+        setInstallations(prev =>
           prev.filter(e => e.walletAddress !== walletAddress)
         );
         return true;
       } catch (err: unknown) {
         setError(
-          err instanceof Error ? err.message : 'Failed to delete equipment'
+          err instanceof Error ? err.message : 'Failed to delete installation'
         );
         return false;
       }
@@ -142,13 +146,13 @@ export const useVendorEquipments = (
   }, [refresh]);
 
   return {
-    equipments,
+    installations,
     isLoading,
     error,
     refresh,
-    createEquipment,
-    updateEquipment,
-    deleteEquipment,
+    createInstallation,
+    updateInstallation,
+    deleteInstallation,
     clearError,
   };
 };
