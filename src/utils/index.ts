@@ -73,8 +73,10 @@ export function handleApiError(
       details?: string;
     };
   };
-  const errorMessage =
+  const rawError =
     resp?.data?.error || resp?.data?.message || resp?.error || 'Unknown error';
+  const errorMessage =
+    typeof rawError === 'string' ? rawError : JSON.stringify(rawError);
   return new TapayokaApiError(`Failed to ${operation}: ${errorMessage}`, {
     statusCode: resp?.status,
     errorCode: resp?.data?.code,
