@@ -35,6 +35,8 @@ import type {
   VendorInstallationSlotUpdateRequest,
   VendorInstallationSlotBulkCreateRequest,
   UserProfile,
+  BuyerInstallationInfo,
+  BuyerSlotDetail,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
 import { buildUrl, createAuthHeaders, handleApiError } from '../utils/index';
@@ -498,6 +500,51 @@ export class TapayokaClient {
     );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get buyer slots');
+    }
+    return response.data;
+  }
+
+  // =========================================================================
+  // Buyer: Installation Info
+  // =========================================================================
+
+  async getBuyerInstallationInfo(
+    walletAddress: string,
+    tz: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<BuyerInstallationInfo>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<BuyerInstallationInfo>
+    >(
+      buildUrl(
+        this.baseUrl,
+        `/api/v1/buyer/installations/${encodeURIComponent(walletAddress)}?tz=${encodeURIComponent(tz)}`
+      ),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get buyer installation info');
+    }
+    return response.data;
+  }
+
+  async getBuyerSlotDetail(
+    slotId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<BuyerSlotDetail>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<BuyerSlotDetail>
+    >(
+      buildUrl(
+        this.baseUrl,
+        `/api/v1/buyer/slots/detail/${encodeURIComponent(slotId)}`
+      ),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get buyer slot detail');
     }
     return response.data;
   }
