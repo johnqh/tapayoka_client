@@ -39,7 +39,12 @@ import type {
   BuyerSlotDetail,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
-import { buildUrl, createAuthHeaders, handleApiError } from '../utils/index';
+import {
+  buildUrl,
+  createAuthHeaders,
+  createHeaders,
+  handleApiError,
+} from '../utils/index';
 
 export class TapayokaClient {
   private readonly baseUrl: string;
@@ -348,9 +353,9 @@ export class TapayokaClient {
 
   async verifyDevice(
     data: DeviceVerifyRequest,
-    token: FirebaseIdToken
+    token?: FirebaseIdToken | null
   ): Promise<BaseResponse<DeviceVerifyResponse>> {
-    const headers = createAuthHeaders(token);
+    const headers = token ? createAuthHeaders(token) : createHeaders();
     const response = await this.networkClient.post<
       BaseResponse<DeviceVerifyResponse>
     >(buildUrl(this.baseUrl, '/api/v1/buyer/devices/verify'), data, {

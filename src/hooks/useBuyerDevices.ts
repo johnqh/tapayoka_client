@@ -22,7 +22,6 @@ export const useBuyerDevices = (
 
   const verifyDevice = useCallback(
     async (data: DeviceVerifyRequest): Promise<DeviceVerifyResponse | null> => {
-      if (!token) return null;
       try {
         setIsLoading(true);
         setError(null);
