@@ -1,10 +1,6 @@
 export type FirebaseIdToken = string;
 
 export const QUERY_KEYS = {
-  DEVICES: 'tapayoka-devices',
-  DEVICE: 'tapayoka-device',
-  OFFERINGS: 'tapayoka-offerings',
-  OFFERING: 'tapayoka-offering',
   ORDERS: 'tapayoka-orders',
   ORDER: 'tapayoka-order',
   AUTHORIZATIONS: 'tapayoka-authorizations',

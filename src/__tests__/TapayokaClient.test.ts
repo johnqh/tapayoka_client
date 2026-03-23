@@ -47,139 +47,6 @@ describe('TapayokaClient', () => {
     });
   });
 
-  describe('vendor device endpoints', () => {
-    it('getDevices calls correct URL with auth headers', async () => {
-      const result = await client.getDevices(slug, token);
-      expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/devices`,
-        { headers: expectedHeaders }
-      );
-      expect(result.success).toBe(true);
-      expect(result.data).toEqual([]);
-    });
-
-    it('getDevice calls correct URL', async () => {
-      network.get.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        success: true,
-        data: { success: true, data: { walletAddress: '0xabc' } },
-      });
-      const result = await client.getDevice(slug, '0xabc', token);
-      expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc`,
-        { headers: expectedHeaders }
-      );
-      expect(result.data).toEqual({ walletAddress: '0xabc' });
-    });
-
-    it('createDevice posts data', async () => {
-      const data = { walletAddress: '0xabc', label: 'Test' };
-      network.post.mockResolvedValueOnce({
-        ok: true,
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        success: true,
-        data: {
-          success: true,
-          data: { walletAddress: '0xabc', label: 'Test' },
-        },
-      });
-      await client.createDevice(slug, data as any, token);
-      expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/devices`,
-        data,
-        { headers: expectedHeaders }
-      );
-    });
-
-    it('updateDevice puts data', async () => {
-      const data = { label: 'Updated' };
-      network.put.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        success: true,
-        data: { success: true, data: { label: 'Updated' } },
-      });
-      await client.updateDevice(slug, '0xabc', data as any, token);
-      expect(network.put).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc`,
-        data,
-        { headers: expectedHeaders }
-      );
-    });
-
-    it('deleteDevice calls delete', async () => {
-      await client.deleteDevice(slug, '0xabc', token);
-      expect(network.delete).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc`,
-        { headers: expectedHeaders }
-      );
-    });
-
-    it('assignDeviceOfferings puts offering IDs', async () => {
-      const data = { offeringIds: ['uuid-1'] };
-      network.put.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        success: true,
-      });
-      await client.assignDeviceOfferings(slug, '0xabc', data, token);
-      expect(network.put).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/devices/0xabc/services`,
-        data,
-        { headers: expectedHeaders }
-      );
-    });
-  });
-
-  describe('vendor offering endpoints', () => {
-    it('getOfferings calls correct URL', async () => {
-      await client.getOfferings(slug, token);
-      expect(network.get).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/services`,
-        { headers: expectedHeaders }
-      );
-    });
-
-    it('createOffering posts data', async () => {
-      const data = {
-        name: 'Wash',
-        type: 'FIXED' as const,
-        priceCents: 200,
-      };
-      network.post.mockResolvedValueOnce({
-        ok: true,
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        success: true,
-        data: { success: true, data: { id: 'inst-1', ...data } },
-      });
-      await client.createOffering(slug, data as any, token);
-      expect(network.post).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/services`,
-        data,
-        { headers: expectedHeaders }
-      );
-    });
-
-    it('deleteOffering calls delete', async () => {
-      await client.deleteOffering(slug, 'inst-1', token);
-      expect(network.delete).toHaveBeenCalledWith(
-        `${baseUrl}/api/v1/entities/${slug}/services/inst-1`,
-        { headers: expectedHeaders }
-      );
-    });
-  });
-
   describe('vendor orders & analytics', () => {
     it('getOrders uses default limit', async () => {
       await client.getOrders(slug, token);
@@ -258,7 +125,7 @@ describe('TapayokaClient', () => {
     it('createOrder posts order data', async () => {
       const data = {
         deviceWalletAddress: '0xabc',
-        offeringId: 'inst-1',
+        pricingTierId: 'tier-1',
         amountCents: 100,
       };
       network.post.mockResolvedValueOnce({
@@ -381,8 +248,8 @@ describe('TapayokaClient', () => {
         success: false,
         error: 'Not found',
       });
-      await expect(client.getDevices(slug, token)).rejects.toThrow(
-        'Failed to get devices'
+      await expect(client.getOrders(slug, token)).rejects.toThrow(
+        'Failed to get orders'
       );
     });
 
@@ -395,8 +262,8 @@ describe('TapayokaClient', () => {
         success: true,
         data: null,
       });
-      await expect(client.getDevices(slug, token)).rejects.toThrow(
-        'Failed to get devices'
+      await expect(client.getOrders(slug, token)).rejects.toThrow(
+        'Failed to get orders'
       );
     });
   });

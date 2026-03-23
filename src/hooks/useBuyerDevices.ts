@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { NetworkClient } from '@sudobility/types';
 import type {
-  DeviceVerifyResponse,
+  BuyerVerifyResponse,
   DeviceVerifyRequest,
 } from '@sudobility/tapayoka_types';
 import { TapayokaClient } from '../network/TapayokaClient';
@@ -13,7 +13,7 @@ export const useBuyerDevices = (
   _entitySlug: string | null,
   token: FirebaseIdToken | null
 ) => {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceVerifyResponse | null>(
+  const [deviceInfo, setDeviceInfo] = useState<BuyerVerifyResponse | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -21,11 +21,14 @@ export const useBuyerDevices = (
   const client = new TapayokaClient({ networkClient, baseUrl });
 
   const verifyDevice = useCallback(
-    async (data: DeviceVerifyRequest): Promise<DeviceVerifyResponse | null> => {
+    async (
+      data: DeviceVerifyRequest,
+      tz?: string
+    ): Promise<BuyerVerifyResponse | null> => {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await client.verifyDevice(data, token);
+        const response = await client.verifyDevice(data, token, tz);
         const result = response.data ?? null;
         setDeviceInfo(result);
         return result;

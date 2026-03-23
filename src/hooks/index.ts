@@ -1,5 +1,3 @@
-export { useDevices } from './useDevices';
-export { useOfferings } from './useOfferings';
 export { useOrders } from './useOrders';
 export { useAuthorizations } from './useAuthorizations';
 export { useBuyerDevices } from './useBuyerDevices';

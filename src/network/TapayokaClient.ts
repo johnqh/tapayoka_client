@@ -1,23 +1,16 @@
 import type { NetworkClient, BaseResponse } from '@sudobility/types';
 import type {
-  Device,
-  Offering,
   Order,
-  DeviceVerifyResponse,
+  BuyerVerifyResponse,
   AuthorizationResponse,
   DashboardStats,
   OrderDetailed,
   QrCodeResponse,
-  DeviceCreateRequest,
-  DeviceUpdateRequest,
-  OfferingCreateRequest,
-  OfferingUpdateRequest,
   DeviceVerifyRequest,
   CreateOrderRequest,
   ProcessPaymentRequest,
   CreateAuthorizationRequest,
   TelemetryEventRequest,
-  DeviceOfferingAssignRequest,
   VendorLocation,
   VendorModel,
   VendorOffering,
@@ -35,8 +28,6 @@ import type {
   VendorInstallationSlotUpdateRequest,
   VendorInstallationSlotBulkCreateRequest,
   UserProfile,
-  BuyerInstallationInfo,
-  BuyerSlotDetail,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
 import {
@@ -95,209 +86,6 @@ export class TapayokaClient {
   }
 
   // =========================================================================
-  // Vendor: Devices
-  // =========================================================================
-
-  async getDevices(
-    entitySlug: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Device[]>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<Device[]>>(
-      this.entityUrl(entitySlug, 'devices'),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get devices');
-    }
-    return response.data;
-  }
-
-  async getDevice(
-    entitySlug: string,
-    walletAddress: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Device>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<Device>>(
-      this.entityUrl(entitySlug, `devices/${walletAddress}`),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get device');
-    }
-    return response.data;
-  }
-
-  async createDevice(
-    entitySlug: string,
-    data: DeviceCreateRequest,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Device>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<BaseResponse<Device>>(
-      this.entityUrl(entitySlug, 'devices'),
-      data,
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'create device');
-    }
-    return response.data;
-  }
-
-  async updateDevice(
-    entitySlug: string,
-    walletAddress: string,
-    data: DeviceUpdateRequest,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Device>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.put<BaseResponse<Device>>(
-      this.entityUrl(entitySlug, `devices/${walletAddress}`),
-      data,
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'update device');
-    }
-    return response.data;
-  }
-
-  async deleteDevice(
-    entitySlug: string,
-    walletAddress: string,
-    token: FirebaseIdToken
-  ): Promise<void> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `devices/${walletAddress}`),
-      { headers }
-    );
-    if (!response.ok) {
-      throw handleApiError(response, 'delete device');
-    }
-  }
-
-  async getDeviceOfferings(
-    entitySlug: string,
-    walletAddress: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Offering[]>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<Offering[]>>(
-      this.entityUrl(entitySlug, `devices/${walletAddress}/services`),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get device offerings');
-    }
-    return response.data;
-  }
-
-  async assignDeviceOfferings(
-    entitySlug: string,
-    walletAddress: string,
-    data: DeviceOfferingAssignRequest,
-    token: FirebaseIdToken
-  ): Promise<void> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.put(
-      this.entityUrl(entitySlug, `devices/${walletAddress}/services`),
-      data,
-      { headers }
-    );
-    if (!response.ok) {
-      throw handleApiError(response, 'assign device offerings');
-    }
-  }
-
-  // =========================================================================
-  // Vendor: Offerings
-  // =========================================================================
-
-  async getOfferings(
-    entitySlug: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Offering[]>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<Offering[]>>(
-      this.entityUrl(entitySlug, 'services'),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get offerings');
-    }
-    return response.data;
-  }
-
-  async getOffering(
-    entitySlug: string,
-    id: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Offering>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<BaseResponse<Offering>>(
-      this.entityUrl(entitySlug, `services/${id}`),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get offering');
-    }
-    return response.data;
-  }
-
-  async createOffering(
-    entitySlug: string,
-    data: OfferingCreateRequest,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Offering>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<BaseResponse<Offering>>(
-      this.entityUrl(entitySlug, 'services'),
-      data,
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'create offering');
-    }
-    return response.data;
-  }
-
-  async updateOffering(
-    entitySlug: string,
-    id: string,
-    data: OfferingUpdateRequest,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<Offering>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.put<BaseResponse<Offering>>(
-      this.entityUrl(entitySlug, `services/${id}`),
-      data,
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'update offering');
-    }
-    return response.data;
-  }
-
-  async deleteOffering(
-    entitySlug: string,
-    id: string,
-    token: FirebaseIdToken
-  ): Promise<void> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `services/${id}`),
-      { headers }
-    );
-    if (!response.ok) {
-      throw handleApiError(response, 'delete offering');
-    }
-  }
-
-  // =========================================================================
   // Vendor: Orders & Analytics
   // =========================================================================
 
@@ -353,12 +141,19 @@ export class TapayokaClient {
 
   async verifyDevice(
     data: DeviceVerifyRequest,
-    token?: FirebaseIdToken | null
-  ): Promise<BaseResponse<DeviceVerifyResponse>> {
+    token?: FirebaseIdToken | null,
+    tz?: string
+  ): Promise<BaseResponse<BuyerVerifyResponse>> {
     const headers = token ? createAuthHeaders(token) : createHeaders();
+    const url = tz
+      ? buildUrl(
+          this.baseUrl,
+          `/api/v1/buyer/devices/verify?tz=${encodeURIComponent(tz)}`
+        )
+      : buildUrl(this.baseUrl, '/api/v1/buyer/devices/verify');
     const response = await this.networkClient.post<
-      BaseResponse<DeviceVerifyResponse>
-    >(buildUrl(this.baseUrl, '/api/v1/buyer/devices/verify'), data, {
+      BaseResponse<BuyerVerifyResponse>
+    >(url, data, {
       headers,
     });
     if (!response.ok || !response.data) {
@@ -483,75 +278,6 @@ export class TapayokaClient {
     if (!response.ok) {
       throw handleApiError(response, 'report telemetry');
     }
-  }
-
-  // =========================================================================
-  // Buyer: Slots
-  // =========================================================================
-
-  async getBuyerSlots(
-    walletAddress: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<VendorInstallationSlot[]>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<VendorInstallationSlot[]>
-    >(
-      buildUrl(
-        this.baseUrl,
-        `/api/v1/buyer/slots/${encodeURIComponent(walletAddress)}`
-      ),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get buyer slots');
-    }
-    return response.data;
-  }
-
-  // =========================================================================
-  // Buyer: Installation Info
-  // =========================================================================
-
-  async getBuyerInstallationInfo(
-    walletAddress: string,
-    tz: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<BuyerInstallationInfo>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<BuyerInstallationInfo>
-    >(
-      buildUrl(
-        this.baseUrl,
-        `/api/v1/buyer/installations/${encodeURIComponent(walletAddress)}?tz=${encodeURIComponent(tz)}`
-      ),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get buyer installation info');
-    }
-    return response.data;
-  }
-
-  async getBuyerSlotDetail(
-    slotId: string,
-    token: FirebaseIdToken
-  ): Promise<BaseResponse<BuyerSlotDetail>> {
-    const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<BuyerSlotDetail>
-    >(
-      buildUrl(
-        this.baseUrl,
-        `/api/v1/buyer/slots/detail/${encodeURIComponent(slotId)}`
-      ),
-      { headers }
-    );
-    if (!response.ok || !response.data) {
-      throw handleApiError(response, 'get buyer slot detail');
-    }
-    return response.data;
   }
 
   // =========================================================================
