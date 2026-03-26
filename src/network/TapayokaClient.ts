@@ -43,7 +43,34 @@ export class TapayokaClient {
 
   constructor(config: { networkClient: NetworkClient; baseUrl: string }) {
     this.baseUrl = config.baseUrl;
-    this.networkClient = config.networkClient;
+    const nc = config.networkClient;
+    this.networkClient = {
+      request: nc.request.bind(nc),
+      get: (async (url: string, options?: unknown) => {
+        console.log('[TapayokaClient →] GET', url);
+        const res = await nc.get(url, options as never);
+        console.log('[TapayokaClient ←] GET', url, res.data);
+        return res;
+      }) as NetworkClient['get'],
+      post: (async (url: string, body?: unknown, options?: unknown) => {
+        console.log('[TapayokaClient →] POST', url, body);
+        const res = await nc.post(url, body, options as never);
+        console.log('[TapayokaClient ←] POST', url, res.data);
+        return res;
+      }) as NetworkClient['post'],
+      put: (async (url: string, body?: unknown, options?: unknown) => {
+        console.log('[TapayokaClient →] PUT', url, body);
+        const res = await nc.put(url, body, options as never);
+        console.log('[TapayokaClient ←] PUT', url, res.data);
+        return res;
+      }) as NetworkClient['put'],
+      delete: (async (url: string, options?: unknown) => {
+        console.log('[TapayokaClient →] DELETE', url);
+        const res = await nc.delete(url, options as never);
+        console.log('[TapayokaClient ←] DELETE', url, res.data);
+        return res;
+      }) as NetworkClient['delete'],
+    };
   }
 
   private entityUrl(entitySlug: string, path: string): string {
