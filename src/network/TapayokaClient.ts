@@ -44,6 +44,7 @@ export class TapayokaClient {
   constructor(config: { networkClient: NetworkClient; baseUrl: string }) {
     this.baseUrl = config.baseUrl;
     const nc = config.networkClient;
+    /* eslint-disable no-console */
     this.networkClient = {
       request: nc.request.bind(nc),
       get: (async (url: string, options?: unknown) => {
@@ -71,6 +72,7 @@ export class TapayokaClient {
         return res;
       }) as NetworkClient['delete'],
     };
+    /* eslint-enable no-console */
   }
 
   private entityUrl(entitySlug: string, path: string): string {
