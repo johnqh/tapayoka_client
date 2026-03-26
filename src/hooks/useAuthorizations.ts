@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { NetworkClient } from '@sudobility/types';
-import type { AuthorizationResponse } from '@sudobility/tapayoka_types';
+import type { Order, PiCommand } from '@sudobility/tapayoka_types';
 import { TapayokaClient } from '../network/TapayokaClient';
 import type { FirebaseIdToken } from '../types';
 
@@ -15,13 +15,16 @@ export const useAuthorizations = (
   const client = new TapayokaClient({ networkClient, baseUrl });
 
   const createAuthorization = useCallback(
-    async (orderId: string): Promise<AuthorizationResponse | null> => {
+    async (
+      orderId: string
+    ): Promise<{ order: Order; pi?: PiCommand } | null> => {
       if (!token) return null;
       try {
         setIsLoading(true);
         setError(null);
         const response = await client.createAuthorization({ orderId }, token);
-        return response.data ?? null;
+        if (!response.data) return null;
+        return { order: response.data, pi: response.pi };
       } catch (err: unknown) {
         setError(
           err instanceof Error ? err.message : 'Failed to create authorization'
@@ -35,13 +38,16 @@ export const useAuthorizations = (
   );
 
   const getAuthorization = useCallback(
-    async (orderId: string): Promise<AuthorizationResponse | null> => {
+    async (
+      orderId: string
+    ): Promise<{ order: Order; pi?: PiCommand } | null> => {
       if (!token) return null;
       try {
         setIsLoading(true);
         setError(null);
         const response = await client.getAuthorization(orderId, token);
-        return response.data ?? null;
+        if (!response.data) return null;
+        return { order: response.data, pi: response.pi };
       } catch (err: unknown) {
         setError(
           err instanceof Error ? err.message : 'Failed to get authorization'

@@ -168,7 +168,15 @@ describe('TapayokaClient', () => {
         statusText: 'OK',
         headers: {},
         success: true,
-        data: { success: true, data: { id: 'order-1', status: 'PAID' } },
+        data: {
+          success: true,
+          data: { id: 'order-1', status: 'AUTHORIZED' },
+          pi: {
+            command: 'EXECUTE',
+            data: { orderId: 'order-1' },
+            signing: { walletAddress: '0x', message: '{}', signature: '0x' },
+          },
+        },
       });
       await client.processPayment(data, token);
       expect(network.post).toHaveBeenCalledWith(
@@ -190,7 +198,12 @@ describe('TapayokaClient', () => {
         success: true,
         data: {
           success: true,
-          data: { authorization: {}, payload: {}, serverSignature: '0x' },
+          data: { id: 'auth-1', orderId: 'order-1' },
+          pi: {
+            command: 'EXECUTE',
+            data: {},
+            signing: { walletAddress: '0x', message: '{}', signature: '0x' },
+          },
         },
       });
       await client.createAuthorization(data, token);
@@ -210,7 +223,12 @@ describe('TapayokaClient', () => {
         success: true,
         data: {
           success: true,
-          data: { authorization: {}, payload: {}, serverSignature: '0x' },
+          data: { id: 'auth-1', orderId: 'order-1' },
+          pi: {
+            command: 'EXECUTE',
+            data: {},
+            signing: { walletAddress: '0x', message: '{}', signature: '0x' },
+          },
         },
       });
       await client.getAuthorization('order-1', token);

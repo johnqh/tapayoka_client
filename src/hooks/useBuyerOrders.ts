@@ -4,6 +4,7 @@ import type {
   Order,
   CreateOrderRequest,
   ProcessPaymentRequest,
+  PiCommand,
 } from '@sudobility/tapayoka_types';
 import { TapayokaClient } from '../network/TapayokaClient';
 import type { FirebaseIdToken } from '../types';
@@ -50,12 +51,14 @@ export const useBuyerOrders = (
   );
 
   const processPayment = useCallback(
-    async (data: ProcessPaymentRequest): Promise<Order | null> => {
+    async (
+      data: ProcessPaymentRequest
+    ): Promise<{ order: Order; pi?: PiCommand } | null> => {
       if (!token) return null;
       try {
         setError(null);
         const response = await client.processPayment(data, token);
-        return response.data ?? null;
+        return { order: response.data!, pi: response.pi };
       } catch (err: unknown) {
         setError(
           err instanceof Error ? err.message : 'Failed to process payment'

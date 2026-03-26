@@ -2,13 +2,13 @@ import type { NetworkClient, BaseResponse } from '@sudobility/types';
 import type {
   Order,
   BuyerVerifyResponse,
-  AuthorizationResponse,
   DashboardStats,
   OrderDetailed,
   QrCodeResponse,
   DeviceVerifyRequest,
   CreateOrderRequest,
   ProcessPaymentRequest,
+  PiApiResponse,
   CreateAuthorizationRequest,
   TelemetryEventRequest,
   VendorLocation,
@@ -229,9 +229,9 @@ export class TapayokaClient {
   async processPayment(
     data: ProcessPaymentRequest,
     token: FirebaseIdToken
-  ): Promise<BaseResponse<Order>> {
+  ): Promise<PiApiResponse<Order>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<BaseResponse<Order>>(
+    const response = await this.networkClient.post<PiApiResponse<Order>>(
       buildUrl(this.baseUrl, `/api/v1/buyer/orders/${data.orderId}/pay`),
       data,
       { headers }
@@ -249,13 +249,13 @@ export class TapayokaClient {
   async createAuthorization(
     data: CreateAuthorizationRequest,
     token: FirebaseIdToken
-  ): Promise<BaseResponse<AuthorizationResponse>> {
+  ): Promise<PiApiResponse<Order>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<
-      BaseResponse<AuthorizationResponse>
-    >(buildUrl(this.baseUrl, '/api/v1/buyer/authorizations'), data, {
-      headers,
-    });
+    const response = await this.networkClient.post<PiApiResponse<Order>>(
+      buildUrl(this.baseUrl, '/api/v1/buyer/authorizations'),
+      data,
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'create authorization');
     }
@@ -265,13 +265,12 @@ export class TapayokaClient {
   async getAuthorization(
     orderId: string,
     token: FirebaseIdToken
-  ): Promise<BaseResponse<AuthorizationResponse>> {
+  ): Promise<PiApiResponse<Order>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.get<
-      BaseResponse<AuthorizationResponse>
-    >(buildUrl(this.baseUrl, `/api/v1/buyer/authorizations/${orderId}`), {
-      headers,
-    });
+    const response = await this.networkClient.get<PiApiResponse<Order>>(
+      buildUrl(this.baseUrl, `/api/v1/buyer/authorizations/${orderId}`),
+      { headers }
+    );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get authorization');
     }
