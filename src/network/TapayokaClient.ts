@@ -28,6 +28,9 @@ import type {
   VendorInstallationSlotUpdateRequest,
   VendorInstallationSlotBulkCreateRequest,
   UserProfile,
+  Entity,
+  DeviceLog,
+  DeleteResult,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
 import {
@@ -101,9 +104,9 @@ export class TapayokaClient {
   async acceptTosAndCreateEntity(
     data: { displayName?: string; acceptTos: true },
     token: FirebaseIdToken
-  ): Promise<BaseResponse<unknown>> {
+  ): Promise<BaseResponse<Entity>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post<BaseResponse<unknown>>(
+    const response = await this.networkClient.post<BaseResponse<Entity>>(
       buildUrl(this.baseUrl, '/api/v1/entities'),
       data,
       { headers }
@@ -296,16 +299,17 @@ export class TapayokaClient {
   async reportTelemetry(
     data: TelemetryEventRequest,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeviceLog>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.post(
+    const response = await this.networkClient.post<BaseResponse<DeviceLog>>(
       buildUrl(this.baseUrl, '/api/v1/buyer/telemetry'),
       data,
       { headers }
     );
-    if (!response.ok) {
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'report telemetry');
     }
+    return response.data;
   }
 
   // =========================================================================
@@ -379,15 +383,15 @@ export class TapayokaClient {
     entitySlug: string,
     id: string,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeleteResult>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `locations/${id}`),
-      { headers }
-    );
-    if (!response.ok) {
+    const response = await this.networkClient.delete<
+      BaseResponse<DeleteResult>
+    >(this.entityUrl(entitySlug, `locations/${id}`), { headers });
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'delete vendor location');
     }
+    return response.data;
   }
 
   async getVendorLocationOfferings(
@@ -483,15 +487,15 @@ export class TapayokaClient {
     entitySlug: string,
     id: string,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeleteResult>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `models/${id}`),
-      { headers }
-    );
-    if (!response.ok) {
+    const response = await this.networkClient.delete<
+      BaseResponse<DeleteResult>
+    >(this.entityUrl(entitySlug, `models/${id}`), { headers });
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'delete vendor model');
     }
+    return response.data;
   }
 
   async getVendorModelOfferings(
@@ -568,15 +572,15 @@ export class TapayokaClient {
     entitySlug: string,
     id: string,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeleteResult>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `offerings/${id}`),
-      { headers }
-    );
-    if (!response.ok) {
+    const response = await this.networkClient.delete<
+      BaseResponse<DeleteResult>
+    >(this.entityUrl(entitySlug, `offerings/${id}`), { headers });
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'delete vendor offering');
     }
+    return response.data;
   }
 
   // =========================================================================
@@ -637,15 +641,17 @@ export class TapayokaClient {
     entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeleteResult>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `installations/${walletAddress}`),
-      { headers }
-    );
-    if (!response.ok) {
+    const response = await this.networkClient.delete<
+      BaseResponse<DeleteResult>
+    >(this.entityUrl(entitySlug, `installations/${walletAddress}`), {
+      headers,
+    });
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'delete vendor installation');
     }
+    return response.data;
   }
 
   // =========================================================================
@@ -747,32 +753,35 @@ export class TapayokaClient {
     entitySlug: string,
     slotId: string,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeleteResult>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
-      this.entityUrl(entitySlug, `installation-slots/${slotId}`),
-      { headers }
-    );
-    if (!response.ok) {
+    const response = await this.networkClient.delete<
+      BaseResponse<DeleteResult>
+    >(this.entityUrl(entitySlug, `installation-slots/${slotId}`), { headers });
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'delete vendor installation slot');
     }
+    return response.data;
   }
 
   async deleteAllVendorInstallationSlots(
     entitySlug: string,
     walletAddress: string,
     token: FirebaseIdToken
-  ): Promise<void> {
+  ): Promise<BaseResponse<DeleteResult>> {
     const headers = createAuthHeaders(token);
-    const response = await this.networkClient.delete(
+    const response = await this.networkClient.delete<
+      BaseResponse<DeleteResult>
+    >(
       this.entityUrl(
         entitySlug,
         `installation-slots/installation/${walletAddress}`
       ),
       { headers }
     );
-    if (!response.ok) {
+    if (!response.ok || !response.data) {
       throw handleApiError(response, 'delete all vendor installation slots');
     }
+    return response.data;
   }
 }
