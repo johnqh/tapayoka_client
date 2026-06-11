@@ -11,6 +11,8 @@ import type {
   PiApiResponse,
   CreateAuthorizationRequest,
   TelemetryEventRequest,
+  PaymentMethod,
+  SetupIntentResponse,
   VendorLocation,
   VendorModel,
   VendorOffering,
@@ -288,6 +290,71 @@ export class TapayokaClient {
     );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'get my orders');
+    }
+    return response.data;
+  }
+
+  // =========================================================================
+  // Buyer: Payment Methods
+  // =========================================================================
+
+  async getPaymentMethods(
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<PaymentMethod[]>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<PaymentMethod[]>
+    >(buildUrl(this.baseUrl, '/api/v1/buyer/payment-methods'), { headers });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'list payment methods');
+    }
+    return response.data;
+  }
+
+  async createPaymentMethodSetupIntent(
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<SetupIntentResponse>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<
+      BaseResponse<SetupIntentResponse>
+    >(
+      buildUrl(this.baseUrl, '/api/v1/buyer/payment-methods/setup-intent'),
+      {},
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'create setup intent');
+    }
+    return response.data;
+  }
+
+  async deletePaymentMethod(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<null>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.delete<BaseResponse<null>>(
+      buildUrl(this.baseUrl, `/api/v1/buyer/payment-methods/${id}`),
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'delete payment method');
+    }
+    return response.data;
+  }
+
+  async setDefaultPaymentMethod(
+    id: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<null>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.put<BaseResponse<null>>(
+      buildUrl(this.baseUrl, `/api/v1/buyer/payment-methods/${id}/default`),
+      {},
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'set default payment method');
     }
     return response.data;
   }
