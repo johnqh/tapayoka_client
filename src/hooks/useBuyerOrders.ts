@@ -69,6 +69,21 @@ export const useBuyerOrders = (
     [token]
   );
 
+  const cancelOrder = useCallback(
+    async (orderId: string): Promise<boolean> => {
+      if (!token) return false;
+      try {
+        setError(null);
+        await client.cancelOrder(orderId, token);
+        return true;
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to cancel order');
+        return false;
+      }
+    },
+    [token]
+  );
+
   const clearError = useCallback(() => setError(null), []);
 
   useEffect(() => {
@@ -82,6 +97,7 @@ export const useBuyerOrders = (
     refresh,
     createOrder,
     processPayment,
+    cancelOrder,
     clearError,
   };
 };

@@ -33,6 +33,7 @@ import type {
   Entity,
   DeviceLog,
   DeleteResult,
+  SignedData,
 } from '@sudobility/tapayoka_types';
 import type { FirebaseIdToken } from '../types';
 import {
@@ -243,6 +244,41 @@ export class TapayokaClient {
     );
     if (!response.ok || !response.data) {
       throw handleApiError(response, 'process payment');
+    }
+    return response.data;
+  }
+
+  async cancelOrder(
+    orderId: string,
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<Order>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.post<BaseResponse<Order>>(
+      buildUrl(this.baseUrl, `/api/v1/buyer/orders/${orderId}/cancel`),
+      undefined,
+      { headers }
+    );
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'cancel order');
+    }
+    return response.data;
+  }
+
+  // =========================================================================
+  // Device provisioning
+  // =========================================================================
+
+  async getServerSetupPayload(
+    token: FirebaseIdToken
+  ): Promise<BaseResponse<SignedData<{ walletAddress: string }>>> {
+    const headers = createAuthHeaders(token);
+    const response = await this.networkClient.get<
+      BaseResponse<SignedData<{ walletAddress: string }>>
+    >(buildUrl(this.baseUrl, '/api/v1/device-setup/server-wallet'), {
+      headers,
+    });
+    if (!response.ok || !response.data) {
+      throw handleApiError(response, 'get server setup payload');
     }
     return response.data;
   }
