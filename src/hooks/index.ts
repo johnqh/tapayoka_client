@@ -14,3 +14,5 @@ export { useVendorInstallationSlots } from './useVendorInstallationSlots';
 export { useMe } from './useMe';
 export { useDeviceSetup } from './useDeviceSetup';
 export type { ServerSetupPayload } from './useDeviceSetup';
+export { useTos } from './useTos';
+export type { UseTosReturn } from './useTos';
