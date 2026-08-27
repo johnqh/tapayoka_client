@@ -1,5 +1,10 @@
 # tapayoka_client
 
+> **Git policy — never auto-commit or auto-push.** Leave your work in the working tree.
+> Run `git commit`, `git push`, `gh pr create`, or `scripts/push_all.sh` **only when the user
+> explicitly asks in that turn**. Approval for an earlier change does not carry forward, and
+> finishing a task is not permission to commit it.
+
 React client library for Tapayoka API with TanStack Query hooks.
 
 ## Package: `@sudobility/tapayoka_client` (restricted)
@@ -38,3 +43,7 @@ bun run test        # Vitest
 
 - @sudobility/tapayoka_types, @sudobility/types
 - @tanstack/react-query >=5, react >=18
+
+## Git Workflow
+
+- Do not use feature branches for code changes. Always stay on the current branch.
